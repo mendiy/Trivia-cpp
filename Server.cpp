@@ -3,9 +3,9 @@
 #include <string>
 #include <iostream>
 
-Server::Server()
+Server::Server(IDatabase* database) : _handlerFactory(database), _communicator(new Communicator(_handlerFactory))
 {
-	_communicator = new Communicator;
+	_database = database;
 }
 
 Server::~Server()

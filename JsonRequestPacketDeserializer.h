@@ -10,7 +10,7 @@ struct LoginRequest
 {
 	std::string username;
 	std::string password;
-}; LoginRequest;
+}; 
 
 struct SignupRequest
 {

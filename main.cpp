@@ -8,20 +8,23 @@
 
 int main()
 {
+	IDatabase* db = new IDatabase; // change later
 	try
 	{
 		// NOTICE at the end of this block the WSA will be closed 
 		WSAInitializer wsa_init;
-		Server server;
+		Server server(db);
 		server.run();
-		//std::vector<unsigned char> res = JsonResponsePacketSerializer::serializeResponse(LoginResponse());
+		delete db;
 	}
 	catch (const std::exception& e)
 	{
+		delete db;
 		std::cout << "Exception was thrown in function: " << e.what() << std::endl;
 	}
 	catch (...)
 	{
+		delete db;
 		std::cout << "Unknown exception in main !" << std::endl;
 	}
 }
