@@ -8,8 +8,8 @@
 #include <exception>
 #include "Helper.h"
 #include <exception>
-
-//#define INADDR_ANY  (ULONG)0x00000000
+#include "JsonRequestPacketDeserializer.h"
+#include "JsonResponsePacketSerializer.h"
 
 static const unsigned short PORT = 8000;
 
@@ -71,9 +71,45 @@ void Communicator::handleNewClient(SOCKET clientSocket)
 {
 	try
 	{
-		std::string msg = Helper::getStringPartFromSocket(clientSocket, 5);
-		std::cout << msg << "\n";
-		Helper::sendData(clientSocket, msg);
+		const int HEADER_LENGTH = 5;
+		while (true)
+		{
+			char* header = new char[HEADER_LENGTH];
+			recv(clientSocket, header, HEADER_LENGTH, 0);
+			unsigned char code = header[0];
+			std::cout << code << "\n";
+			unsigned int jsonSize = 0;
+			for (int i = 1; i < HEADER_LENGTH; i++)
+			{
+				jsonSize = jsonSize << 8;
+				jsonSize = jsonSize ^ header[i];
+			}
+			std::cout << jsonSize << "\n";
+			delete[] header;
+			std::vector<unsigned char> buffer;
+			char* data = new char[jsonSize];
+			recv(clientSocket, data, jsonSize, 0);
+			for (int i = 0; i < jsonSize; i++)
+			{
+				buffer.push_back(data[i]);
+			}
+			//buffer.push_back(0);
+			std::cout << buffer.size() << "\n";
+			delete[] data;
+			LoginRequest lr = JsonRequestPacketDeserializer::deserializeLoginRequest(buffer);
+			std::cout << lr.username << ", " << lr.password << "\n";
+			std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(LoginResponse());
+			int resSize = bufferToSend.size();
+			//std::cout << "bd: " << bufferToSend.data() << "\n";
+			char* response = new char[resSize];
+			for (int i = 0; i < resSize; i++)
+			{
+				response[i] = bufferToSend[i];
+				//std::cout << "e" << i << " : " << response[i];
+			}
+			send(clientSocket, response, resSize, 0);
+			delete[] response;
+		}
 	}
 	catch (const std::exception& e)
 	{
