@@ -9,7 +9,6 @@
 #include "Helper.h"
 #include <exception>
 
-//#define INADDR_ANY  (ULONG)0x00000000
 
 static const unsigned short PORT = 8000;
 

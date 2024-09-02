@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <exception>
+#include "JsonResponsePacketSerializer.h"
 
 int main()
 {
@@ -13,6 +14,7 @@ int main()
 		WSAInitializer wsa_init;
 		Server server;
 		server.run();
+		//std::vector<unsigned char> res = JsonResponsePacketSerializer::serializeResponse(LoginResponse());
 	}
 	catch (const std::exception& e)
 	{
