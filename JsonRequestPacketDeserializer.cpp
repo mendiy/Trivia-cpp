@@ -4,9 +4,10 @@ static const int DATA_LEN = 4;
 
 LoginRequest JsonRequestPacketDeserializer::deserializeLoginRequest(std::vector<unsigned char>& buffer)
 {
-	
-	json loginJson = json::from_bson(buffer);
-	
+	std::cout << buffer.data() << "\n";
+	std::string jsonString(buffer.begin(), buffer.end());
+	json loginJson = json::parse(jsonString);
+	//json loginJson = json::from_bson(buffer);
 	LoginRequest newLogin = { loginJson["username"], loginJson["password"] };
 	std::cout << newLogin.username << " " << newLogin.password << "\n";
 
@@ -15,16 +16,18 @@ LoginRequest JsonRequestPacketDeserializer::deserializeLoginRequest(std::vector<
 
 SignupRequest JsonRequestPacketDeserializer::deserializeSignupRequest(std::vector<unsigned char>& buffer)
 {
-	return SignupRequest();
+	std::cout << buffer.data() << "\n";
+
+	std::string jsonString(buffer.begin(), buffer.end());
+	json signupJson  = json::parse(jsonString);
+	//json signupJson = json::from_bson(buffer);
+	SignupRequest newSign = { signupJson["username"], signupJson["password"], signupJson["email"]};
+	std::cout << newSign.username << " " << newSign.password << newSign.email << "\n";
+	return newSign;
 }
 
 int JsonRequestPacketDeserializer::binaryToDecimal(unsigned char* buffer)
 {
-	//unsigned char messageLen[DATA_LEN];
-	//for (int i = 0; i < DATA_LEN; i++)
-	//{
-	//	messageLen[i] = buffer[i];
-	//}
 
 	return (buffer[3] << 24) + (buffer[2] << 16) + (buffer[1] << 8) + buffer[0];
 
