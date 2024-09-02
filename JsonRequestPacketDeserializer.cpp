@@ -5,7 +5,9 @@ static const int DATA_LEN = 4;
 LoginRequest JsonRequestPacketDeserializer::deserializeLoginRequest(std::vector<unsigned char>& buffer)
 {
 	
-	json loginJson = json::from_bson(buffer);
+	//std::string jsonString(buffer.begin(), buffer.end());
+	json loginJson = json::parse(buffer);
+	//json loginJson = json::from_bson(buffer);
 	
 	LoginRequest newLogin = { loginJson["username"], loginJson["password"] };
 	std::cout << newLogin.username << " " << newLogin.password << "\n";
