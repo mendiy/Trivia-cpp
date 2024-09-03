@@ -1,14 +1,40 @@
 #include "LoginManager.h"
+#include <algorithm>
 
-void LoginManager::signup(std::string, std::string, std::string)
+int LoginManager::signup(std::string username, std::string password, std::string email)
 {
+
+	bool logged = m_database->addNewUser(username, password, email);
+	if (logged)
+	{
+		LoggedUser loggedUser(username);
+		m_loggedUsers.push_back(loggedUser);
+		return 0;
+	}
+	return 1;
 }
 
-void LoginManager::login(std::string, std::string)
+int LoginManager::login(std::string username, std::string password)
 {
+	bool logged = m_database->doesPasswordMatch(username, password);
+	if (logged)
+	{
+		LoggedUser loggedUser(username);
+		m_loggedUsers.push_back(loggedUser);
+		return 0;
+	}
+	return 1;
 }
 
-void LoginManager::logout(std::string username)
+int LoginManager::logout(std::string username)
 {
-	m_loggedUsers.(username);
+	for (auto it = m_loggedUsers.begin(); it != m_loggedUsers.end(); it++)
+	{
+		if (it->getUsername() == username)
+		{
+			m_loggedUsers.erase(it);
+			return 0;
+		}
+	}
+	return 1;
 }
