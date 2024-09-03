@@ -10,16 +10,20 @@
 #include <exception>
 #include "JsonRequestPacketDeserializer.h"
 #include "JsonResponsePacketSerializer.h"
+#include "LoginRequestHandler.h";
+#include "IRequestHandler.h";
+#include <ctime>
 
 static const unsigned short PORT = 8000;
 
-Communicator::Communicator() : _clients()
+Communicator::Communicator(RequestHandlerFactory& handlerFactory) : _clients() , _handlerFactory(handlerFactory)
 {
 	_serverSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
 	if (_serverSocket == INVALID_SOCKET)
 		throw std::exception(__FUNCTION__ " - socket");
 }
+
 
 Communicator::~Communicator()
 {
@@ -43,7 +47,11 @@ void Communicator::startHandleRequest()
 		if (client_socket == INVALID_SOCKET)
 			throw std::exception(__FUNCTION__);
 
+		// we need to add client to clients map
+		_clients[client_socket] = _handlerFactory.createLoginRequestHandler();
+
 		// create new thread for client	and detach from it
+		
 		std::thread clientThread(&Communicator::handleNewClient, this, client_socket);
 		clientThread.detach();
 	}
@@ -74,6 +82,7 @@ void Communicator::handleNewClient(SOCKET clientSocket)
 		const int HEADER_LENGTH = 5;
 		while (true)
 		{
+			IRequestHandler* currentHandler = _clients[clientSocket];
 			char* header = new char[HEADER_LENGTH];
 			recv(clientSocket, header, HEADER_LENGTH, 0);
 			unsigned char code = header[0];
@@ -93,22 +102,39 @@ void Communicator::handleNewClient(SOCKET clientSocket)
 			{
 				buffer.push_back(data[i]);
 			}
-			//buffer.push_back(0);
 			std::cout << buffer.size() << "\n";
 			delete[] data;
-			LoginRequest lr = JsonRequestPacketDeserializer::deserializeLoginRequest(buffer);
-			std::cout << lr.username << ", " << lr.password << "\n";
-			std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(LoginResponse());
-			int resSize = bufferToSend.size();
-			//std::cout << "bd: " << bufferToSend.data() << "\n";
-			char* response = new char[resSize];
-			for (int i = 0; i < resSize; i++)
+			time_t timestamp;
+			RequestInfo reqInfo = { code, time(&timestamp), buffer};
+			if (currentHandler->isRequestRelevant(reqInfo))
 			{
-				response[i] = bufferToSend[i];
-				//std::cout << "e" << i << " : " << response[i];
+				RequestResult reqRes = currentHandler->handleRequest(reqInfo);
+				if (!reqRes.newHandler)
+					throw(std::exception("error in server db"));
+				delete currentHandler;
+				_clients[clientSocket] = reqRes.newHandler;
+				int resSize = reqRes.response.size();
+				char* response = new char[resSize];
+				for (int i = 0; i < resSize; i++)
+				{
+					response[i] = reqRes.response[i];
+				}
+				send(clientSocket, response, resSize, 0);
+				delete[] response;
 			}
-			send(clientSocket, response, resSize, 0);
-			delete[] response;
+			else
+			{
+				std::cout << "wrong login code";
+				ErrorResponse er = { "Error in login code" };
+				std::vector<unsigned char> responseBuffer = JsonResponsePacketSerializer::serializeResponse(er);
+				int resSize = responseBuffer.size();
+				char* response = new char[resSize];
+				for (int i = 0; i < resSize; i++)
+				{
+					response[i] = responseBuffer[i];
+				}
+				send(clientSocket, response, resSize, 0);
+			}
 		}
 	}
 	catch (const std::exception& e)

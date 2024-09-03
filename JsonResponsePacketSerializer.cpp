@@ -31,7 +31,7 @@ std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(Error
     std::vector<unsigned char> buffer;
     buffer.push_back(er.status);
     json j;
-    j["message"] = "ERROR";
+    j["message"] = er.message;
     serializeJson(j, buffer);
     return buffer;
 }
