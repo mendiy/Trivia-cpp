@@ -6,6 +6,24 @@
 // for convenience
 using json = nlohmann::json;
 
+struct GetPlayersInRoomRequest
+{
+	unsigned int roomId;
+};
+
+struct JoinRoomRequest
+{
+	unsigned int roomId;
+};
+
+struct CreateRoomRequest
+{
+	std::string roomName;
+	unsigned int maxUsers;
+	unsigned int questionCount;
+	unsigned int answerTimeout;
+};
+
 struct LoginRequest
 {
 	std::string username;
@@ -25,6 +43,9 @@ class JsonRequestPacketDeserializer
 public:
 	static LoginRequest deserializeLoginRequest(std::vector<unsigned char>& buffer);
 	static SignupRequest deserializeSignupRequest(std::vector<unsigned char>& buffer);
+	static GetPlayersInRoomRequest deserializeGetPlayerRequest(std::vector<unsigned char>& buffer);
+	static JoinRoomRequest deserializeJoinRoomRequest(std::vector<unsigned char>& buffer);
+	static CreateRoomRequest deserializeCreateRoomRequest(std::vector<unsigned char>& buffer);
 private:
 	static int binaryToDecimal(unsigned char* buffer);
 

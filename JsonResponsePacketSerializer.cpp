@@ -57,4 +57,91 @@ std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(SignU
     return buffer;
 }
 
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(LogoutResponse lr)
+{
+    std::vector<unsigned char> buffer;
+    buffer.push_back(lr.status);
+    json j;
+    j["status"] = lr.status;
+    serializeJson(j, buffer);
+    return buffer;
+}
+
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(GetRoomsResponse gr)
+{
+    std::vector<unsigned char> buffer;
+    buffer.push_back(gr.status);
+    json j;
+    j["Rooms"] = json::array();
+    for (RoomData rd : gr.rooms)
+    {
+        json temp = {}; // complete later with room data
+        j["Rooms"].push_back(temp);
+    }
+    serializeJson(j, buffer);
+    return buffer;
+}
+
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(GetPlayersInRoomResponse gp)
+{
+    std::vector<unsigned char> buffer;
+    buffer.push_back(gp.status);
+    json j;
+    j["PlayersInRooms"] = json::array();
+    for (std::string player : gp.players)
+    {
+        j["PlayersInRooms"].push_back(player);
+    }
+    serializeJson(j, buffer);
+    return buffer;
+}
+
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(JoinRoomResponse jr)
+{
+    std::vector<unsigned char> buffer;
+    buffer.push_back(jr.status);
+    json j;
+    j["status"] = jr.status;
+    serializeJson(j, buffer);
+    return buffer;
+}
+
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(CreateRoomResponse cr)
+{
+    std::vector<unsigned char> buffer;
+    buffer.push_back(cr.status);
+    json j;
+    j["status"] = cr.status;
+    serializeJson(j, buffer);
+    return buffer;
+}
+
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(GetHighScoreResponse gh)
+{
+    std::vector<unsigned char> buffer;
+    buffer.push_back(gh.status);
+    json j;
+    j["HighScores"] = json::array();
+    for (std::string highScore : gh.highScores)
+    {
+        j["HighScores"].push_back(highScore);
+    }
+    serializeJson(j, buffer);
+    return buffer;
+}
+
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(GetPersonalStatsResponse gs)
+{
+    std::vector<unsigned char> buffer;
+    buffer.push_back(gs.status);
+    json j;
+    j["UserStatistics"] = json::array();
+    for (std::string stat : gs.statistics)
+    {
+        j["UserStatistics"].push_back(stat);
+    }
+    serializeJson(j, buffer);
+    return buffer;
+}
+
 
