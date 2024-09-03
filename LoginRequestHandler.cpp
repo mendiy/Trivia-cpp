@@ -4,6 +4,9 @@
 #include "JsonResponsePacketSerializer.h"
 #include "RequestHandlerFactory.h"
 
+#define LOGIN_REQUEST_CODE 111
+#define SIGNUP_REQUEST_CODE 112
+
 LoginRequestHandler::LoginRequestHandler(RequestHandlerFactory& handlerFactory) : _handlerFactory(handlerFactory)
 {
 }
@@ -11,20 +14,21 @@ LoginRequestHandler::LoginRequestHandler(RequestHandlerFactory& handlerFactory) 
 bool LoginRequestHandler::isRequestRelevant(RequestInfo reqInfo)
 {
     std::cout << ctime(&reqInfo.recievalTime) << "\n";
-    return reqInfo.id == 111 || reqInfo.id == 112;
+    return reqInfo.id == LOGIN_REQUEST_CODE || reqInfo.id == SIGNUP_REQUEST_CODE;
 }
 
 RequestResult LoginRequestHandler::handleRequest(RequestInfo reqInfo)
 {
     try
     {
-        if (reqInfo.id == 111)
+        if (reqInfo.id == LOGIN_REQUEST_CODE)
             return login(reqInfo);
         return signup(reqInfo);
     }
     catch (...)
     {
-        std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(ErrorResponse());
+        ErrorResponse er = { "Error in server db" };
+        std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(er);
         return { bufferToSend, nullptr };
     }
 }

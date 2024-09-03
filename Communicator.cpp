@@ -102,7 +102,6 @@ void Communicator::handleNewClient(SOCKET clientSocket)
 			{
 				buffer.push_back(data[i]);
 			}
-			//buffer.push_back(0);
 			std::cout << buffer.size() << "\n";
 			delete[] data;
 			time_t timestamp;
@@ -112,6 +111,7 @@ void Communicator::handleNewClient(SOCKET clientSocket)
 				RequestResult reqRes = currentHandler->handleRequest(reqInfo);
 				if (!reqRes.newHandler)
 					throw(std::exception("error in server db"));
+				delete currentHandler;
 				_clients[clientSocket] = reqRes.newHandler;
 				int resSize = reqRes.response.size();
 				char* response = new char[resSize];
@@ -125,6 +125,15 @@ void Communicator::handleNewClient(SOCKET clientSocket)
 			else
 			{
 				std::cout << "wrong login code";
+				ErrorResponse er = { "Error in login code" };
+				std::vector<unsigned char> responseBuffer = JsonResponsePacketSerializer::serializeResponse(er);
+				int resSize = responseBuffer.size();
+				char* response = new char[resSize];
+				for (int i = 0; i < resSize; i++)
+				{
+					response[i] = responseBuffer[i];
+				}
+				send(clientSocket, response, resSize, 0);
 			}
 		}
 	}
