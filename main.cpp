@@ -5,16 +5,17 @@
 #include <fstream>
 #include <exception>
 #include "JsonResponsePacketSerializer.h"
+#include "SqliteDataBase.h"
 
 int main()
 {
+	IDatabase* db = new SqliteDataBase; 
 	try
 	{
 		// NOTICE at the end of this block the WSA will be closed 
 		WSAInitializer wsa_init;
-		Server server;
+		Server server(db);
 		server.run();
-		//std::vector<unsigned char> res = JsonResponsePacketSerializer::serializeResponse(LoginResponse());
 	}
 	catch (const std::exception& e)
 	{
@@ -24,4 +25,5 @@ int main()
 	{
 		std::cout << "Unknown exception in main !" << std::endl;
 	}
+	delete db;
 }
