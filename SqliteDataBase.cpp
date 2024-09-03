@@ -6,6 +6,7 @@
 #include "LoggedUser.h"
 #include "IDatabase.h"
 #include "Question.h"
+#include "StatisticsManager.h"
 
 
 //static std::string user;
@@ -16,9 +17,9 @@ static int userCallback(void* isExists, int argc, char** argv, char** azColName)
 	{
 		*(bool*)isExists = (*argv[0] == '1');
 	}
-
 	return 0;
 }
+
 static int questionsCallback(void* questionList, int argc, char** argv, char** azColName) {
 	std::list<Question>* questions = static_cast<std::list<Question>*>(questionList);
 	std::vector<std::string> ans;
@@ -41,6 +42,35 @@ static int questionsCallback(void* questionList, int argc, char** argv, char** a
 	return 0;
 }
 
+static int averageCallback(void* average, int argc, char** argv, char** azColName) {
+	if (argc > 0 && argv[0])
+	{
+		*(float*)average = std::stof(argv[0]);
+	}
+	return 0;
+}
+static int totalCallback(void* total, int argc, char** argv, char** azColName) {
+	if (argc > 0 && argv[0])
+	{
+		*(int*)total = std::stoi(argv[0]);
+		//std::cout << "Callback - total: " << argv[0] << "\n";
+	}
+	return 0;
+}
+
+static int highScoresCallback(void* res, int argc, char** argv, char** azColName) {
+	std::vector<std::string>* result = static_cast<std::vector<std::string>*>(res);
+	std::string row;
+
+	for (int i = 0; i < argc; i++) {
+		
+		row += (std::string)azColName[i] + ": " + (std::string)argv[i] + ", ";		
+	}
+	row.pop_back();
+	row.pop_back();
+	result->push_back(row);
+	return 0;
+}
 
 SqliteDataBase::SqliteDataBase()
 {
@@ -136,8 +166,13 @@ SqliteDataBase::SqliteDataBase()
 		std::cout << "Failed to insert Query: " << errMessage << "\n";
 	else
 		std::cout << "Query inserted successfully.\n";*/
-
-	//getQuestions(5);
+	/*StatisticsManager m(this);
+	std::vector<std::string> score = m.getHighScore();
+	for (int i = 0; i < score.size(); i++)
+	{
+		std::cout << score[i] << "\n";
+	}*/
+	//m.getUserStatistics("user1");
 	std::cout << "DB Created!" << std::endl;
 }
 
@@ -155,7 +190,6 @@ void SqliteDataBase::printQuestions(std::list<Question> questionList)
 
 bool SqliteDataBase::open()
 {
-
 	std::string dbFileName = "Trivia_DB";
 	int res = sqlite3_open(dbFileName.c_str(), &db);
 	if (res != SQLITE_OK)
@@ -169,7 +203,8 @@ bool SqliteDataBase::open()
 
 bool SqliteDataBase::close()
 {
-	return false;
+	sqlite3_close(db);
+	return true;
 }
 
 bool SqliteDataBase::doesUserExist(std::string username)
@@ -188,9 +223,7 @@ bool SqliteDataBase::doesUserExist(std::string username)
 	}
 	
 	std::cout << "user selected\n";
-	
 	sqlite3_close(db);
-	
 	return isExists;
 }
 
@@ -208,11 +241,7 @@ bool SqliteDataBase::doesPasswordMatch(std::string username, std::string passwor
 		sqlite3_free(zErrMsg);
 		return false;
 	}
-
-	std::cout << "password match!\t" << isMatch << "\n";
-
 	sqlite3_close(db);
-
 	return isMatch;
 }
 
@@ -222,7 +251,6 @@ bool SqliteDataBase::addNewUser(std::string username, std::string password, std:
 	std::cout << "from add new user: " << username << ", " << password << ", " << email << "\n";
 	std::string sql = "INSERT INTO USERS (USERNAME, PASSWORD, EMAIL) "  \
 		"VALUES ('" + username + "', '" + password + "', '" + email + "'); ";
-	std::cout << "query: " << sql << "\n";
 	/* Execute SQL statement */
 	int rc = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &zErrMsg);
 
@@ -231,9 +259,7 @@ bool SqliteDataBase::addNewUser(std::string username, std::string password, std:
 		sqlite3_free(zErrMsg);
 		return false;
 	}
-	
 	std::cout << "user created successfully\n";
-	
 	sqlite3_close(db);
 	return true;
 }
@@ -242,7 +268,6 @@ std::list<Question> SqliteDataBase::getQuestions(int amount)
 {
 	std::list<Question> questionsList;
 	char* zErrMsg = 0;
-	Question q;
 	std::string sql = "SELECT * from QUESTIONS LIMIT " + std::to_string(amount) + ";";
 
 	/* Execute SQL statement */
@@ -253,37 +278,109 @@ std::list<Question> SqliteDataBase::getQuestions(int amount)
 		sqlite3_free(zErrMsg);
 	}
 	sqlite3_close(db);
-
-	//this->printQuestions(questionsList);
 	return questionsList;
 }
 
-float SqliteDataBase::getPlayerAverageAnswerTime(std::string time)
+float SqliteDataBase::getPlayerAverageAnswerTime(std::string username)
 {
-	return 0.0f;
+	float average = 0;
+	char* zErrMsg = 0;
+	std::string sql = "SELECT sum(TOTAL_TIME) / sum(TOTAL_QUESTIONS) from STATISTICS WHERE USERNAME = '" + username + "';";
+
+	/* Execute SQL statement */
+	int rc = sqlite3_exec(db, sql.c_str(), averageCallback, &average, &zErrMsg);
+
+	if (rc != SQLITE_OK) {
+		std::cerr << zErrMsg << "\n";
+		sqlite3_free(zErrMsg);
+	}
+	sqlite3_close(db);
+	std::cout << "averge: " << average << "\n";
+	return average;
 }
 
-int SqliteDataBase::getNumOfCorrectAnswers(std::string)
+int SqliteDataBase::getNumOfCorrectAnswers(std::string username)
 {
-	return 0;
+	int total = 0;
+	char* zErrMsg = 0;
+	std::string sql = "SELECT sum(CORRECT_ANSWERS) FROM STATISTICS WHERE USERNAME = '" + username + "';";
+	/* Execute SQL statement */
+	int rc = sqlite3_exec(db, sql.c_str(), totalCallback, &total, &zErrMsg);
+
+	if (rc != SQLITE_OK) {
+		std::cerr << zErrMsg << "\n";
+		sqlite3_free(zErrMsg);
+	}
+	sqlite3_close(db);
+	std::cout << "Total Crrect Answers: " << total << "\n";
+	return total;
 }
 
-int SqliteDataBase::getNumOfTotalAnswers(std::string)
+int SqliteDataBase::getNumOfTotalAnswers(std::string username)
 {
-	return 0;
+	int total = 0;
+	char* zErrMsg = 0;
+	std::string sql = "SELECT sum(TOTAL_QUESTIONS) FROM STATISTICS WHERE USERNAME = '" + username + "';";
+	/* Execute SQL statement */
+	int rc = sqlite3_exec(db, sql.c_str(), totalCallback, &total, &zErrMsg);
+
+	if (rc != SQLITE_OK) {
+		std::cerr << zErrMsg << "\n";
+		sqlite3_free(zErrMsg);
+	}
+	sqlite3_close(db);
+	std::cout << "Total Questions: " << total << "\n";
+	return total;
 }
 
-int SqliteDataBase::getNumOfPlayerGames(std::string)
+int SqliteDataBase::getNumOfPlayerGames(std::string username)
 {
-	return 0;
+	int total = 0;
+	char* zErrMsg = 0;
+	std::string sql = "SELECT count(GAME_ID) FROM STATISTICS WHERE USERNAME = '" + username + "';";
+	/* Execute SQL statement */
+	int rc = sqlite3_exec(db, sql.c_str(), totalCallback, &total, &zErrMsg);
+
+	if (rc != SQLITE_OK) {
+		std::cerr << zErrMsg << "\n";
+		sqlite3_free(zErrMsg);
+	}
+	sqlite3_close(db);
+	std::cout << "Total Questions: " << total << "\n";
+	return total;
 }
 
-int SqliteDataBase::getPlayerScore(std::string)
+int SqliteDataBase::getPlayerScore(std::string username)
 {
-	return 0;
+	int total = 0;
+	char* zErrMsg = 0;
+	std::string sql = "SELECT sum(SCORE) FROM STATISTICS WHERE USERNAME = '" + username + "';";
+	/* Execute SQL statement */
+	int rc = sqlite3_exec(db, sql.c_str(), totalCallback, &total, &zErrMsg);
+
+	if (rc != SQLITE_OK) {
+		std::cerr << zErrMsg << "\n";
+		sqlite3_free(zErrMsg);
+	}
+	sqlite3_close(db);
+	std::cout << "Total Questions: " << total << "\n";
+	return total;
 }
 
-int SqliteDataBase::getHighScores()
+std::vector<std::string> SqliteDataBase::getHighScores()
 {
-	return 0;
+	 std::vector<std::string> res;
+	char* zErrMsg = 0;
+	std::string sql = "SELECT * FROM STATISTICS ORDER BY SCORE DESC LIMIT 5;";
+	/* Execute SQL statement */
+	int rc = sqlite3_exec(db, sql.c_str(), highScoresCallback, &res, &zErrMsg);
+
+	if (rc != SQLITE_OK) {
+		std::cerr << zErrMsg << "\n";
+		sqlite3_free(zErrMsg);
+	}
+	
+	sqlite3_close(db);
+
+	return res;
 }
