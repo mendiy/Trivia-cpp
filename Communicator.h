@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include "IRequestHandler.h"
 #include "RequestHandlerFactory.h"
+#include <mutex>
 
 using std::unordered_map;
 
@@ -19,4 +20,5 @@ private:
 	SOCKET _serverSocket;
 	unordered_map<SOCKET, IRequestHandler*> _clients;
 	RequestHandlerFactory& _handlerFactory;
+	std::mutex _clientsMutex;
 };
