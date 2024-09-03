@@ -7,7 +7,8 @@
 // for test
 class MenuRequestHandler : public IRequestHandler
 {
-
+	virtual bool isRequestRelevant(RequestInfo reqInfo) { return false; };
+	virtual RequestResult handleRequest(RequestInfo reqInfo) { return {}; };
 };
 
 // for test

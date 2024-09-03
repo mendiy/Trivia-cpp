@@ -12,7 +12,7 @@ LoginRequestHandler* RequestHandlerFactory::createLoginRequestHandler()
 
 MenuRequestHandler* RequestHandlerFactory::createMenuRequestHandler()
 {
-    return nullptr;
+    return new MenuRequestHandler();
 }
 
 LoginManager& RequestHandlerFactory::getLoginManager()

@@ -13,7 +13,7 @@ static int callback(void* isExists, int argc, char** argv, char** azColName) {
 	int i;
 	if (argc > 0 && argv[0])
 	{
-		*(bool*)isExists = argv[0] == "1";
+		*(bool*)isExists = (*argv[0] == '1');
 	}
 
 	
@@ -76,7 +76,7 @@ bool SqliteDataBase::doesUserExist(std::string username)
 {
 	char* zErrMsg = 0;
 	bool isExists = false;
-	std::string sql = "SELECT EXISTS(SELECT 1 from USERS WHER USERNAME = " + username + ")";
+	std::string sql = "SELECT EXISTS(SELECT 1 from USERS WHER USERNAME = '" + username + "');";
 
 	/* Execute SQL statement */
 	int rc = sqlite3_exec(db, sql.c_str(), nullptr, &isExists, &zErrMsg);
@@ -98,10 +98,10 @@ bool SqliteDataBase::doesPasswordMatch(std::string username, std::string passwor
 {
 	char* zErrMsg = 0;
 	bool isMatch = false;
-	std::string sql = "SELECT EXISTS(SELECT 1 from USERS WHER USERNAME = " + username + "AND PASSWORD =" + password + ")";
+	std::string sql = "SELECT EXISTS(SELECT 1 from USERS WHERE USERNAME = '" + username + "' AND PASSWORD = '" + password + "');";
 
 	/* Execute SQL statement */
-	int rc = sqlite3_exec(db, sql.c_str(), nullptr, &isMatch, &zErrMsg);
+	int rc = sqlite3_exec(db, sql.c_str(), callback, &isMatch, &zErrMsg);
 
 	if (rc != SQLITE_OK) {
 		std::cerr << zErrMsg << "\n";
@@ -109,7 +109,7 @@ bool SqliteDataBase::doesPasswordMatch(std::string username, std::string passwor
 		return false;
 	}
 
-	std::cout << "password match!\n";
+	std::cout << "password match!\t" << isMatch << "\n";
 
 	sqlite3_close(db);
 
@@ -119,9 +119,10 @@ bool SqliteDataBase::doesPasswordMatch(std::string username, std::string passwor
 bool SqliteDataBase::addNewUser(std::string username, std::string password, std::string email)
 {
 	char* zErrMsg = 0;
-	std::string sql = "INSERT INTO USERS (USERNAME,PASSWORD,EMAIL) "  \
-		"VALUES (" + username + " " + password + " " + email + "); ";
-
+	std::cout << "from add new user: " << username << ", " << password << ", " << email << "\n";
+	std::string sql = "INSERT INTO USERS (USERNAME, PASSWORD, EMAIL) "  \
+		"VALUES ('" + username + "', '" + password + "', '" + email + "'); ";
+	std::cout << "query: " << sql << "\n";
 	/* Execute SQL statement */
 	int rc = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &zErrMsg);
 
