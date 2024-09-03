@@ -38,14 +38,30 @@ RequestResult LoginRequestHandler::login(RequestInfo reqInfo)
     LoginRequest lr = JsonRequestPacketDeserializer::deserializeLoginRequest(reqInfo.buffer);
     std::cout << lr.username << ", " << lr.password << "\n";
     // call login manager
-    std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(LoginResponse());
-    return { bufferToSend, _handlerFactory.createMenuRequestHandler() };
+    int successLogin = _handlerFactory.getLoginManager().login(lr.username, lr.password);
+    if (successLogin == 0)
+    {
+        std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(LoginResponse());
+        return { bufferToSend, _handlerFactory.createMenuRequestHandler() };
+    }
+
+    ErrorResponse er = { "Error in login details" };
+    std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(er);
+    return { bufferToSend, _handlerFactory.createLoginRequestHandler()};
 }
 
 RequestResult LoginRequestHandler::signup(RequestInfo reqInfo)
 {
     SignupRequest sr = JsonRequestPacketDeserializer::deserializeSignupRequest(reqInfo.buffer);
     // call login manager
-    std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(SignUpResponse());
-    return { bufferToSend, _handlerFactory.createMenuRequestHandler() };
+    int successSignup = _handlerFactory.getLoginManager().signup(sr.username, sr.password, sr.email);
+    if (successSignup == 0)
+    {
+        std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(SignUpResponse());
+        return { bufferToSend, _handlerFactory.createMenuRequestHandler() };
+    }
+
+    ErrorResponse er = { "Error in signup details" };
+    std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(er);
+    return { bufferToSend, _handlerFactory.createLoginRequestHandler() };
 }

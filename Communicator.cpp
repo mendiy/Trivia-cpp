@@ -110,7 +110,7 @@ void Communicator::handleNewClient(SOCKET clientSocket)
 			{
 				RequestResult reqRes = currentHandler->handleRequest(reqInfo);
 				if (!reqRes.newHandler)
-					throw(std::exception("error in server db"));
+					throw(std::exception("error in server db")); // throw or remain in same state
 				delete currentHandler;
 				_clients[clientSocket] = reqRes.newHandler;
 				int resSize = reqRes.response.size();

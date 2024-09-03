@@ -1,16 +1,8 @@
 #pragma once
 #include "LoginRequestHandler.h"
+#include "IDatabase.h"
+#include "LoginManager.h"
 
-// for test
-class LoginManager
-{
-
-};
-// for test
-class IDatabase
-{
-
-};
 
 // for test
 class MenuRequestHandler : public IRequestHandler

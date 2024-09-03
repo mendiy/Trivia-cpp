@@ -1,6 +1,6 @@
 #include "RequestHandlerFactory.h"
 
-RequestHandlerFactory::RequestHandlerFactory(IDatabase* database)
+RequestHandlerFactory::RequestHandlerFactory(IDatabase* database) : _loginManager(database)
 {
     _database = database;
 }

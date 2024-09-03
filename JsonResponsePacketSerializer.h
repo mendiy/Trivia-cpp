@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <string>
 
 #define ERROR_RESPONSE_CODE 255
 #define LOGIN_RESPONSE_CODE 100
