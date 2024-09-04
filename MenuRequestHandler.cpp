@@ -2,6 +2,8 @@
 #include "RequestHandlerFactory.h"
 #include "JsonResponsePacketSerializer.h"
 #include "JsonRequestPacketDeserializer.h"
+#include "RoomManager.h"
+#include "StatisticsManager.h"
 
 #define LOGOUT_REQUEST_CODE 200
 #define GET_ROOMS_REQUEST_CODE 201
@@ -72,42 +74,33 @@ RequestResult MenuRequestHandler::signOut(RequestInfo reqInfo)
 
 RequestResult MenuRequestHandler::getRooms(RequestInfo reqInfo)
 {
-    // call room manager
-    GetRoomsResponse gr = { std::vector<RoomData>{} };
+    std::vector<RoomData> rooms = _handlerFactory.getRoomManager().getRooms();
+    GetRoomsResponse gr = { rooms };
     std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(gr);
     return { bufferToSend, _handlerFactory.createMenuRequestHandler(_user) }; 
-    /*int successLogout = _handlerFactory.getLoginManager().logout(_user.getUsername());
-    if (successLogout == 0)
-    {
-        std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(LogoutResponse());
-        return { bufferToSend, _handlerFactory.createLoginRequestHandler() };
-    }*/
-    /*ErrorResponse er = { "Error in getRoom" };
-    std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(er);
-    return { bufferToSend, _handlerFactory.createMenuRequestHandler(_user) };*/
 }
 
 RequestResult MenuRequestHandler::getPlayersInRoom(RequestInfo reqInfo)
 {
     GetPlayersInRoomRequest getReq = JsonRequestPacketDeserializer::deserializeGetPlayerRequest(reqInfo.buffer);
-    // call room manager
-    GetPlayersInRoomResponse getRes = { std::vector<std::string>{} };
+    std::vector<std::string> players = _handlerFactory.getRoomManager().getRoom(getReq.roomId).getAllUsers();
+    GetPlayersInRoomResponse getRes = { players };
     std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(getRes);
     return { bufferToSend, _handlerFactory.createMenuRequestHandler(_user) };
 }
 
 RequestResult MenuRequestHandler::getPersonalStats(RequestInfo reqInfo)
 {
-    // call stat manager
-    GetPersonalStatsResponse getRes = { std::vector<std::string>{} };
+    std::vector<std::string> stats = _handlerFactory.getStatisticsManager().getUserStatistics(_user.getUsername());
+    GetPersonalStatsResponse getRes = { stats };
     std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(getRes);
     return { bufferToSend, _handlerFactory.createMenuRequestHandler(_user) };
 }
 
 RequestResult MenuRequestHandler::getHighScore(RequestInfo reqInfo)
 {
-    // call stat manager
-    GetHighScoreResponse getRes = { std::vector<std::string>{} };
+    std::vector<std::string> stats = _handlerFactory.getStatisticsManager().getHighScore();
+    GetHighScoreResponse getRes = { stats };
     std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(getRes);
     return { bufferToSend, _handlerFactory.createMenuRequestHandler(_user) };
 }
@@ -115,15 +108,32 @@ RequestResult MenuRequestHandler::getHighScore(RequestInfo reqInfo)
 RequestResult MenuRequestHandler::joinRoom(RequestInfo reqInfo)
 {
     JoinRoomRequest joinReq = JsonRequestPacketDeserializer::deserializeJoinRoomRequest(reqInfo.buffer);
-    // call room manager
-    std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(JoinRoomResponse());
-    return { bufferToSend, _handlerFactory.createMenuRequestHandler(_user) }; // next version we need to update handler
+    int success = _handlerFactory.getRoomManager().getRoom(joinReq.roomId).addUser(_user.getUsername());
+    if (success == 0)
+    {
+        std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(JoinRoomResponse());
+        return { bufferToSend, _handlerFactory.createMenuRequestHandler(_user) }; // next version we need to update handler
+    }
+    ErrorResponse er = { "Error in join room" };
+    std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(er);
+    return { bufferToSend, _handlerFactory.createMenuRequestHandler(_user) };
 }
 
 RequestResult MenuRequestHandler::createRoom(RequestInfo reqInfo)
 {
-    CreateRoomRequest joinReq = JsonRequestPacketDeserializer::deserializeCreateRoomRequest(reqInfo.buffer);
-    // call room manager
-    std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(CreateRoomResponse());
-    return { bufferToSend, _handlerFactory.createMenuRequestHandler(_user) }; // next version we need to update handler
+    CreateRoomRequest createReq = JsonRequestPacketDeserializer::deserializeCreateRoomRequest(reqInfo.buffer);
+    RoomData room;
+    room.maxPlayers = createReq.maxUsers;
+    room.name = createReq.roomName;
+    room.numOfQuestionsInGame = createReq.questionCount;
+    room.timePerQuestion = createReq.answerTimeout;
+    int success = _handlerFactory.getRoomManager().createRoom(_user, room);
+    if (success == 0)
+    {
+        std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(CreateRoomResponse());
+        return { bufferToSend, _handlerFactory.createMenuRequestHandler(_user) }; // next version we need to update handler
+    }
+    ErrorResponse er = { "Error in create room" };
+    std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(er);
+    return { bufferToSend, _handlerFactory.createMenuRequestHandler(_user) };
 }

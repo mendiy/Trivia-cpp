@@ -96,14 +96,14 @@ void Communicator::handleNewClient(SOCKET clientSocket)
 			if (res == 0)
 				continue;
 			unsigned char code = header[0];
-			std::cout << code << "\n";
+			std::cout << "code req: " << (unsigned int)code << "\n";
 			unsigned int jsonSize = 0;
 			for (int i = 1; i < HEADER_LENGTH; i++)
 			{
 				jsonSize = jsonSize << 8;
 				jsonSize = jsonSize ^ header[i];
 			}
-			std::cout << jsonSize << "\n";
+			std::cout << "req len: " << jsonSize << "\n";
 			delete[] header;
 			std::vector<unsigned char> buffer;
 			char* data = new char[jsonSize];
@@ -119,7 +119,7 @@ void Communicator::handleNewClient(SOCKET clientSocket)
 			{
 				buffer.push_back(data[i]);
 			}
-			std::cout << buffer.size() << "\n";
+			//std::cout << buffer.size() << "\n";
 			delete[] data;
 			time_t timestamp;
 			RequestInfo reqInfo = { code, time(&timestamp), buffer};

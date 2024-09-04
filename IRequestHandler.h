@@ -22,7 +22,6 @@ public:
 struct RequestResult
 {
 	~RequestResult() {
-		delete newHandler;
 	}
 	std::vector<unsigned char> response;
 	IRequestHandler *newHandler;
