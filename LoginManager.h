@@ -4,6 +4,7 @@
 #include "IDatabase.h"
 #include "LoggedUser.h"
 #include "SqliteDataBase.h"
+#include <mutex>
 
 
 class LoginManager
@@ -17,4 +18,5 @@ class LoginManager
 	private:
 		IDatabase* m_database;
 		std::vector<LoggedUser> m_loggedUsers;
+		std::mutex m_loginMutex;
 };

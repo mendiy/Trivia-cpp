@@ -22,6 +22,32 @@ SignupRequest JsonRequestPacketDeserializer::deserializeSignupRequest(std::vecto
 	return newSign;
 }
 
+GetPlayersInRoomRequest JsonRequestPacketDeserializer::deserializeGetPlayerRequest(std::vector<unsigned char>& buffer)
+{
+	json reqJson = json::parse(buffer);
+	GetPlayersInRoomRequest newReq = { reqJson["roomId"]};
+	std::cout << "Get Players in RoomId: " << newReq.roomId << "\n";
+	return newReq;
+}
+
+JoinRoomRequest JsonRequestPacketDeserializer::deserializeJoinRoomRequest(std::vector<unsigned char>& buffer)
+{
+	json reqJson = json::parse(buffer);
+	std::cout << "req Join Json: " << reqJson << "\n";
+	JoinRoomRequest newReq = { reqJson["roomId"] };
+	std::cout << "Join RoomId: " << newReq.roomId << "\n";
+	return newReq;
+}
+
+CreateRoomRequest JsonRequestPacketDeserializer::deserializeCreateRoomRequest(std::vector<unsigned char>& buffer)
+{
+	json reqJson = json::parse(buffer);
+	std::cout << "create room json: " << reqJson << "\n";
+	CreateRoomRequest newReq = { reqJson["roomName"], reqJson["maxUsers"], reqJson["questionCount"], reqJson["answerTimeout"] };
+	std::cout << "Create Room: " << newReq.roomName << "\n";
+	return newReq;
+}
+
 int JsonRequestPacketDeserializer::binaryToDecimal(unsigned char* buffer)
 {
 	//unsigned char messageLen[DATA_LEN];
