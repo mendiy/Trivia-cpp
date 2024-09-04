@@ -8,8 +8,9 @@ Room::Room(RoomData metadata, LoggedUser logged)
 
 int Room::addUser(LoggedUser logged)
 {
-	if (m_metadata.maxPlayers >= m_users.size())
+	if (m_metadata.maxPlayers == m_users.size())
 	{
+		std::cout << "Room Size" << m_users.size() << "\n";
 		return 1;
 	}
     m_users.push_back(logged);

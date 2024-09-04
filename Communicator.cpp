@@ -119,7 +119,7 @@ void Communicator::handleNewClient(SOCKET clientSocket)
 			{
 				buffer.push_back(data[i]);
 			}
-			//std::cout << buffer.size() << "\n";
+			//std::cout << buffer.data() << "\n";
 			delete[] data;
 			time_t timestamp;
 			RequestInfo reqInfo = { code, time(&timestamp), buffer};

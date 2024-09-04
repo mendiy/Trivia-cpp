@@ -4,7 +4,7 @@
 int RoomManager::m_id;
 RoomManager::RoomManager()
 {
-
+	m_id = 1;
 }
 
 int RoomManager::createRoom(LoggedUser logged, RoomData room)
@@ -15,7 +15,7 @@ int RoomManager::createRoom(LoggedUser logged, RoomData room)
 	m_id++;
 	for (auto it = m_rooms.begin(); it != m_rooms.end(); it++)
 	{
-		if (it->second.getRoom().name == room.name);
+		if ((it->second.getRoom().name) == room.name)
 		{
 			return 1;
 		}

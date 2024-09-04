@@ -3,7 +3,7 @@
 #include <string>
 #include "Room.h"
 
-#define ERROR_RESPONSE_CODE 255
+#define ERROR_RESPONSE_CODE 126
 #define LOGIN_RESPONSE_CODE 100
 #define SIGNUP_RESPONSE_CODE 101
 #define LOGOUT_RESPONSE_CODE 101
