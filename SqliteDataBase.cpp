@@ -187,6 +187,11 @@ void SqliteDataBase::printQuestions(std::list<Question> questionList)
 	}
 }
 
+int SqliteDataBase::submitGameStatistics(std::string gameData)
+{
+	return 0;
+}
+
 bool SqliteDataBase::open()
 {
 	std::string dbFileName = "Trivia_DB";

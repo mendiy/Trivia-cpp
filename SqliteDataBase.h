@@ -1,6 +1,7 @@
 #pragma once
 #include "IDatabase.h"
 #include "sqlite3.h"
+#include "Game.h"
 
 class SqliteDataBase : public IDatabase
 {
@@ -19,6 +20,9 @@ public:
 	int getNumOfPlayerGames(std::string username);
 	int getPlayerScore(std::string username);
 	std::vector<std::string> getHighScores();
-	sqlite3* db;
 	void printQuestions(std::list<Question> questionList);
+	int submitGameStatistics(std::string gameData);
+
+
+	sqlite3* db;
 };
