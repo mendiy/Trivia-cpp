@@ -5,7 +5,7 @@
 
 Game GameManager::createGame(Room room)
 {
-    std::unordered_map<LoggedUser, GameData> game;
+    std::map<LoggedUser, GameData> game;
     std::vector<std::string> users = room.getAllUsers();
     std::for_each(users.begin(), users.end(), [&](std::string user) {
         LoggedUser u(user);

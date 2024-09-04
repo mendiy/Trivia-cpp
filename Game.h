@@ -7,29 +7,30 @@
 #include <iostream>
 #include <list>
 #include <unordered_map>
+#include <memory>
 
 
 
 struct GameData
 {
-	Question currentQuestion;
-	unsigned int correctAnswerCount;
-	unsigned int wrongAnswerCount;
-	unsigned int averangeAnswerTime;
+	Question currentQuestion {Question()};
+	unsigned int correctAnswerCount {0};
+	unsigned int wrongAnswerCount {0};
+	unsigned int averangeAnswerTime {0};
 }; GameData;
 
 class Game
 {
 public:
-	Game(std::unordered_map<LoggedUser, GameData> players, std::list<Question> questions);
+	Game(std::map<LoggedUser, GameData> players, std::list<Question> questions);
 	Question getQuestionForUser(LoggedUser user);
-	int submitAnswer(LoggedUser user, int answer);
+	int submitAnswer(LoggedUser user, int answer, float time);
 	int removePlayer(LoggedUser user);
-	int submitGameStatsToDB(GameData data);
+	int submitGameStatsToDB(std::map<LoggedUser, GameData> m_players, int m_gameId);
 	static int m_gameId;
 
 private:
 	std::list<Question> m_questions;
-	std::unordered_map<LoggedUser, GameData> m_players;
+	std::map<LoggedUser, GameData> m_players;
 	
 };

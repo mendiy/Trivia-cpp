@@ -21,7 +21,7 @@ public:
 	int getPlayerScore(std::string username);
 	std::vector<std::string> getHighScores();
 	void printQuestions(std::list<Question> questionList);
-	int submitGameStatistics(std::string gameData);
+	int submitGameStatistics(std::map<LoggedUser, GameData> m_players, int gameId);
 
 
 	sqlite3* db;

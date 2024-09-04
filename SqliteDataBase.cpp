@@ -67,6 +67,7 @@ static int highScoresCallback(void* res, int argc, char** argv, char** azColName
 	}
 	row.pop_back();
 	row.pop_back();
+	std::cout << row << "\n";
 	result->push_back(row);
 	return 0;
 }
@@ -172,6 +173,10 @@ SqliteDataBase::SqliteDataBase()
 	//	std::cout << score[i] << "\n";
 	//}
 	//m.getUserStatistics("user1");
+	/*std::map<LoggedUser, GameData> m_players;
+	m_players[LoggedUser("ben")] = GameData({ Question(), 13, 2, 3});
+	submitGameStatistics(m_players, 25);
+	getHighScores();*/
 	std::cout << "DB Created!" << std::endl;
 }
 
@@ -187,8 +192,31 @@ void SqliteDataBase::printQuestions(std::list<Question> questionList)
 	}
 }
 
-int SqliteDataBase::submitGameStatistics(std::string gameData)
+int SqliteDataBase::submitGameStatistics(std::map<LoggedUser, GameData> m_players, int gameId)
 {
+	char* zErrMsg = 0;
+	bool isExists = false;
+	for (auto it_player = m_players.begin(); it_player != m_players.end(); it_player++)
+	{
+		LoggedUser user = it_player->first;
+		GameData data = it_player->second;
+		int totalQuestions = data.correctAnswerCount + data.wrongAnswerCount;
+		int totalTime = data.averangeAnswerTime * totalQuestions;
+		int score = (data.correctAnswerCount * 10) - (data.wrongAnswerCount * 5);
+		std::string sql = "INSERT INTO STATISTICS (USERNAME, GAME_ID, CORRECT_ANSWERS, TOTAL_TIME, TOTAL_QUESTIONS, UNCORRECT_ANSWERS, SCORE) VALUES"
+			"('" + user.getUsername() + "', " + std::to_string(gameId) + ", " + std::to_string(data.correctAnswerCount) + ", " 
+			+ std::to_string(totalTime) + ", " + std::to_string(totalQuestions) + ", " + std::to_string(data.wrongAnswerCount) + ", " 
+			+ std::to_string(score) + ");";
+
+		/* Execute SQL statement */
+		int rc = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &zErrMsg);
+
+		if (rc != SQLITE_OK) {
+			std::cerr << zErrMsg << "\n";
+			sqlite3_free(zErrMsg);
+			return 1;
+		}	
+	}
 	return 0;
 }
 
@@ -227,7 +255,7 @@ bool SqliteDataBase::doesUserExist(std::string username)
 	}
 	
 	std::cout << "user selected\n";
-	close();
+
 	return isExists;
 }
 

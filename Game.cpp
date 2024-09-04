@@ -3,7 +3,7 @@
 int Game::m_gameId;
 
 
-Game::Game(std::unordered_map<LoggedUser, GameData> players, std::list<Question> questions)
+Game::Game(std::map<LoggedUser, GameData> players, std::list<Question> questions)
 {
     m_players = players;
     m_questions = questions;
@@ -12,7 +12,6 @@ Game::Game(std::unordered_map<LoggedUser, GameData> players, std::list<Question>
 
 Question Game::getQuestionForUser(LoggedUser user)
 {
-
     for (auto it = m_questions.begin(); it != m_questions.end(); it++)
     {
         if (it->getQuestion() == m_players[user].currentQuestion.getQuestion())
@@ -28,8 +27,12 @@ Question Game::getQuestionForUser(LoggedUser user)
     return Question();
 }
 
-int Game::submitAnswer(LoggedUser user, int answer)
+int Game::submitAnswer(LoggedUser user, int answer, float time)
 {
+    int currentCount = m_players[user].correctAnswerCount + m_players[user].wrongAnswerCount;
+    float newAverage = ((m_players[user].averangeAnswerTime * currentCount) + time) / (currentCount + 1);
+    m_players[user].averangeAnswerTime = newAverage;
+
    int correct = m_players[user].currentQuestion.getCorrectAnswerId();
    if (correct == answer)
     {
@@ -46,7 +49,7 @@ int Game::removePlayer(LoggedUser user)
     return 0;
 }
 
-int Game::submitGameStatsToDB(GameData data)
+int Game::submitGameStatsToDB(std::map<LoggedUser, GameData> m_players, int m_gamrId)
 {
     return 0;
 }
