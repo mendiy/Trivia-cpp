@@ -48,6 +48,7 @@ void Communicator::startHandleRequest()
 			throw std::exception(__FUNCTION__);
 
 		// we need to add client to clients map
+		std::lock_guard<std::mutex> lock(_clientsMutex);
 		_clients[client_socket] = _handlerFactory.createLoginRequestHandler();
 
 		// create new thread for client	and detach from it
@@ -84,7 +85,16 @@ void Communicator::handleNewClient(SOCKET clientSocket)
 		{
 			IRequestHandler* currentHandler = _clients[clientSocket];
 			char* header = new char[HEADER_LENGTH];
-			recv(clientSocket, header, HEADER_LENGTH, 0);
+			int res;
+			res = recv(clientSocket, header, HEADER_LENGTH, 0);
+			if (res == INVALID_SOCKET)
+			{
+				std::string s = "Error while recieving from socket: ";
+				s += std::to_string(clientSocket);
+				throw std::exception(s.c_str());
+			}
+			if (res == 0)
+				continue;
 			unsigned char code = header[0];
 			std::cout << code << "\n";
 			unsigned int jsonSize = 0;
@@ -98,6 +108,13 @@ void Communicator::handleNewClient(SOCKET clientSocket)
 			std::vector<unsigned char> buffer;
 			char* data = new char[jsonSize];
 			recv(clientSocket, data, jsonSize, 0);
+			if (res == INVALID_SOCKET)
+			{
+				std::string s = "Error while recieving from socket: ";
+				s += std::to_string(clientSocket);
+				throw std::exception(s.c_str());
+			}
+			
 			for (int i = 0; i < jsonSize; i++)
 			{
 				buffer.push_back(data[i]);
@@ -112,14 +129,22 @@ void Communicator::handleNewClient(SOCKET clientSocket)
 				if (!reqRes.newHandler)
 					throw(std::exception("error in server db")); // throw or remain in same state
 				delete currentHandler;
+				std::unique_lock<std::mutex> lock(_clientsMutex);
 				_clients[clientSocket] = reqRes.newHandler;
+				lock.unlock();
 				int resSize = reqRes.response.size();
 				char* response = new char[resSize];
 				for (int i = 0; i < resSize; i++)
 				{
 					response[i] = reqRes.response[i];
 				}
-				send(clientSocket, response, resSize, 0);
+				res = send(clientSocket, response, resSize, 0);
+				if (res == INVALID_SOCKET)
+				{
+					std::string s = "Error while sending message to client socket: ";
+					s += std::to_string(clientSocket);
+					throw std::exception(s.c_str());
+				}
 				delete[] response;
 			}
 			else

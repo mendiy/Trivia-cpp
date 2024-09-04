@@ -42,7 +42,7 @@ RequestResult LoginRequestHandler::login(RequestInfo reqInfo)
     if (successLogin == 0)
     {
         std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(LoginResponse());
-        return { bufferToSend, _handlerFactory.createMenuRequestHandler() };
+        return { bufferToSend, _handlerFactory.createMenuRequestHandler(LoggedUser(lr.username)) };
     }
 
     ErrorResponse er = { "Error in login details" };
@@ -58,7 +58,7 @@ RequestResult LoginRequestHandler::signup(RequestInfo reqInfo)
     if (successSignup == 0)
     {
         std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(SignUpResponse());
-        return { bufferToSend, _handlerFactory.createMenuRequestHandler() };
+        return { bufferToSend, _handlerFactory.createMenuRequestHandler(LoggedUser(sr.username)) };
     }
 
     ErrorResponse er = { "Error in signup details" };
