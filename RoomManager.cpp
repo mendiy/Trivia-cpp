@@ -1,6 +1,7 @@
 #include "RoomManager.h"
 #include <algorithm>
 
+int RoomManager::m_id;
 RoomManager::RoomManager()
 {
 
