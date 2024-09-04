@@ -78,7 +78,14 @@ std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(GetRo
     j["Rooms"] = json::array();
     for (RoomData rd : gr.rooms)
     {
-        json temp = {}; // complete later with room data
+        json temp = { 
+            {"roomId", rd.id}, 
+            {"maxPlayers", rd.maxPlayers}, 
+            {"qTimeout", rd.timePerQuestion},
+            {"isActive", rd.isActive},
+            {"roomName", rd.name},
+            {"numOfQuestions", rd.numOfQuestionsInGame}
+        }; 
         j["Rooms"].push_back(temp);
     }
     serializeJson(j, buffer);

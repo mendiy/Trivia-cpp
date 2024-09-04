@@ -1,4 +1,5 @@
 #include "RoomManager.h"
+#include <algorithm>
 
 RoomManager::RoomManager()
 {
@@ -8,6 +9,16 @@ RoomManager::RoomManager()
 int RoomManager::createRoom(LoggedUser logged, RoomData room)
 {
 	std::lock_guard<std::mutex> lock(m_roomMutex);
+	room.id = m_id;
+	room.isActive = true;
+	m_id++;
+	for (auto it = m_rooms.begin(); it != m_rooms.end(); it++)
+	{
+		if (it->second.getRoom().name == room.name);
+		{
+			return 1;
+		}
+	}
 
 	Room newRoom(room, logged);
 	m_rooms[room.id] = newRoom;

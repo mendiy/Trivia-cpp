@@ -14,6 +14,7 @@ public:
 	std::vector<RoomData> getRooms();
 	Room& getRoom(int ID);
 private:
+	static int m_id;
 	std::map<unsigned int, Room> m_rooms;
 	std::mutex m_roomMutex;
 

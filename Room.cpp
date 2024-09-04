@@ -8,6 +8,10 @@ Room::Room(RoomData metadata, LoggedUser logged)
 
 int Room::addUser(LoggedUser logged)
 {
+	if (m_metadata.maxPlayers >= m_users.size())
+	{
+		return 1;
+	}
     m_users.push_back(logged);
     return 0;
 }
