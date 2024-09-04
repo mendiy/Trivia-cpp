@@ -13,7 +13,8 @@
 #define JOIN_ROOM_REQUEST_CODE 205
 #define CREATE_ROOM_REQUEST_CODE 206
 
-MenuRequestHandler::MenuRequestHandler(LoggedUser user, RequestHandlerFactory& handlerFactory) : _handlerFactory(handlerFactory) , _user(user.getUsername())
+MenuRequestHandler::MenuRequestHandler(LoggedUser user, RequestHandlerFactory& handlerFactory) 
+    : _handlerFactory(handlerFactory) , _user(user.getUsername())
 {
 }
 

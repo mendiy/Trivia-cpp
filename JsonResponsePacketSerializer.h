@@ -13,8 +13,37 @@
 #define GET_PERSONAL_STATS_RESPONSE_CODE 50
 #define JOIN_ROOM_RESPONSE_CODE 60
 #define CREATE_ROOM_RESPONSE_CODE 70
+#define CLOSE_RESPONSE_CODE 80
+#define START_GAME_RESPONSE_CODE 90
+#define GET_ROOM_STATE_RESPONSE_CODE 95
+#define LEAVE_ROOM_RESPONSE_CODE 99
 
-//class RoomData{}; //for test
+
+
+struct CloseRoomResponse
+{
+	unsigned int status{ CLOSE_RESPONSE_CODE };
+}; 
+
+struct StartGameResponse
+{
+	unsigned int status{ START_GAME_RESPONSE_CODE };
+}; 
+
+struct GetRoomStateResponse
+{
+	std::vector<std::string> players{};
+	unsigned int answerTimeout{ 0 };
+	unsigned int questionCount{ 0 };
+	bool hasGameBegun{ false };
+	unsigned int status{ GET_ROOM_STATE_RESPONSE_CODE };
+};
+
+struct LeaveRoomResponse
+{
+	unsigned int status{ LEAVE_ROOM_RESPONSE_CODE };
+};
+
 
 struct LogoutResponse
 {
@@ -74,6 +103,7 @@ struct SignUpResponse
 class JsonResponsePacketSerializer
 {
 public:
+
 	static std::vector<unsigned char> serializeResponse(ErrorResponse);
 	static std::vector<unsigned char> serializeResponse(LoginResponse);
 	static std::vector<unsigned char> serializeResponse(SignUpResponse);
@@ -85,6 +115,11 @@ public:
 	static std::vector<unsigned char> serializeResponse(CreateRoomResponse);
 	static std::vector<unsigned char> serializeResponse(GetHighScoreResponse);
 	static std::vector<unsigned char> serializeResponse(GetPersonalStatsResponse);
+
+	static std::vector<unsigned char> serializeResponse(CloseRoomResponse);
+	static std::vector<unsigned char> serializeResponse(StartGameResponse);
+	static std::vector<unsigned char> serializeResponse(GetRoomStateResponse);
+	static std::vector<unsigned char> serializeResponse(LeaveRoomResponse);
 //private:
 	//static void serializeJson(const json& j, std::vector<unsigned char>& buffer);
 };
