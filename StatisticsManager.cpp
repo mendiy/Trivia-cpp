@@ -9,11 +9,13 @@ StatisticsManager::StatisticsManager(IDatabase* database)
 
 std::vector<std::string> StatisticsManager::getHighScore()
 {
+    std::lock_guard<std::mutex> lock(m_statisticMutex);
     return m_database->getHighScores();
 }
 
 std::vector<std::string> StatisticsManager::getUserStatistics(std::string username)
 {
+    std::lock_guard<std::mutex> lock(m_statisticMutex);
     std::vector<std::string> res;
     float average = m_database->getPlayerAverageAnswerTime(username);
     int totalAnswers = m_database->getNumOfTotalAnswers(username);

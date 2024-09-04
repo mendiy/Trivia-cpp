@@ -3,6 +3,7 @@
 #include <map>
 #include "LoggedUser.h"
 #include "Room.h"
+#include <mutex>
 class RoomManager
 {
 public:
@@ -14,4 +15,6 @@ public:
 	Room& getRoom(int ID);
 private:
 	std::map<unsigned int, Room> m_rooms;
+	std::mutex m_roomMutex;
+
 };

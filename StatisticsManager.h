@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include "IDatabase.h"
+#include <mutex>
 
 class StatisticsManager
 {
@@ -11,4 +12,6 @@ public:
 	std::vector<std::string> getUserStatistics(std::string username);
 private:
 	IDatabase* m_database;
+	std::mutex m_statisticMutex;
+
 };
