@@ -6,14 +6,8 @@
 #include "StatisticsManager.h"
 #include "RoomManager.h"
 #include "LoggedUser.h"
-
-//class RoomManager{}; // for test
-//class StatisticsManager{
-//public:
-//	StatisticsManager(IDatabase* database) : _database(database) {};
-//private:
-//	IDatabase* _database;
-//}; // for test
+#include "RoomAdminRequestHandler.h"
+#include "RoomMemberRequestHandler.h"
 
 class RequestHandlerFactory
 {
@@ -21,6 +15,8 @@ public:
 	RequestHandlerFactory(IDatabase* database);
 	LoginRequestHandler* createLoginRequestHandler();
 	MenuRequestHandler* createMenuRequestHandler(LoggedUser); 
+	RoomAdminRequestHandler* createRoomAdminHandler(LoggedUser, Room); 
+	RoomMemberRequestHandler* createRoomMemberRequestHandler(LoggedUser, Room); 
 	LoginManager& getLoginManager();
 	RoomManager& getRoomManager();
 	StatisticsManager& getStatisticsManager();

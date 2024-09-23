@@ -8,12 +8,7 @@ static void serializeJson(const json& j, std::vector<unsigned char>& buffer)
 {
     const int DATA_SIZE = 4;
     std::string Jstr = j.dump();
-    //std::vector<unsigned char> vBson = json::to_bson(j);
-    //json test = json::from_bson(vBson);
-    //std::cout << test["status"] << "\n";
-    //unsigned int size = vBson.size();
     unsigned int JstrSize = Jstr.size();
-    //std::cout << "len: " << size << "\n";
     std::cout << "len: " << JstrSize << "\n";
     unsigned char sizeChar[DATA_SIZE]{};
     for (int i = DATA_SIZE - 1; i >= 0; i--)
@@ -150,6 +145,53 @@ std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(GetPe
     {
         j["UserStatistics"].push_back(stat);
     }
+    serializeJson(j, buffer);
+    return buffer;
+}
+
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(CloseRoomResponse cr)
+{
+    std::vector<unsigned char> buffer;
+    buffer.push_back(cr.status);
+    json j;
+    j["status"] = cr.status;
+    serializeJson(j, buffer);
+    return buffer;
+}
+
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(StartGameResponse sg)
+{
+    std::vector<unsigned char> buffer;
+    buffer.push_back(sg.status);
+    json j;
+    j["status"] = sg.status;
+    serializeJson(j, buffer);
+    return buffer;
+}
+
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(GetRoomStateResponse gr)
+{
+    std::vector<unsigned char> buffer;
+    buffer.push_back(gr.status);
+    json j = {
+        {"status", gr.status},
+        {"hasGameBegun", gr.hasGameBegun},
+        {"AnswerCount", gr.questionCount},
+        {"answerTimeOut", gr.answerTimeout}
+    };
+    j["players"] = json::array();
+    for (auto player : gr.players)
+        j["players"].push_back(player);
+    serializeJson(j, buffer);
+    return buffer;
+}
+
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(LeaveRoomResponse lr)
+{
+    std::vector<unsigned char> buffer;
+    buffer.push_back(lr.status);
+    json j;
+    j["status"] = lr.status;
     serializeJson(j, buffer);
     return buffer;
 }
