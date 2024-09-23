@@ -2,6 +2,8 @@
 #include "JsonRequestPacketDeserializer.h"
 #include "JsonResponsePacketSerializer.h"
 #include "RequestHandlerFactory.h"
+#include "Game.h"
+#include "Room.h"
 
 #define GET_ROOM_ADMIN_STATE_REQUEST 9
 #define CLOSE_ROOM_REQUEST 7
@@ -51,20 +53,27 @@ RequestResult RoomAdminRequestHandler::closeRoom(RequestInfo reqInfo)
 	}
 	ErrorResponse er = { "Error in close room" };
 	std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(er);
-	return { bufferToSend, _handlerFactory.createRoomAdminHandler(_user, _room) };
+	return { bufferToSend, _handlerFactory.createMenuRequestHandler(_user)};
 }
 
 RequestResult RoomAdminRequestHandler::startGame(RequestInfo reqInfo)
 {
-	//TODO call game manager
+	Game newGame = _handlerFactory.getGameManager().createGame(_room);
+	_handlerFactory.getRoomManager().setIsActive(_room.getRoom().id, true);
 	std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(StartGameResponse());
-	return { bufferToSend, _handlerFactory.createRoomAdminHandler(_user, _room) }; // TODO go to game handler
+	return { bufferToSend, _handlerFactory.createGameRequestHandler(_user, newGame)};
 }
 
 RequestResult RoomAdminRequestHandler::getRoomState(RequestInfo reqInfo)
 {
+	// TODO repeated code in admin handler and member handler
 	GetRoomStateResponse roomState;
-	// TODO fill room data
+	Room currentRoom = _handlerFactory.getRoomManager().getRoom(reqInfo.id);
+	RoomData currentRoomData = currentRoom.getRoom();
+	roomState.answerTimeout = currentRoomData.timePerQuestion;
+	roomState.questionCount = currentRoomData.numOfQuestionsInGame;
+	roomState.hasGameBegun = currentRoomData.isActive;
+	roomState.players = currentRoom.getAllUsers();
 	std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(roomState);
 	return { bufferToSend, _handlerFactory.createRoomMemberRequestHandler(_user, _room) };
 }

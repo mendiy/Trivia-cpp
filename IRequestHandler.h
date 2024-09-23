@@ -24,5 +24,5 @@ struct RequestResult
 	~RequestResult() {
 	}
 	std::vector<unsigned char> response;
-	IRequestHandler *newHandler;
+	IRequestHandler* newHandler{nullptr};
 };

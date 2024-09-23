@@ -14,7 +14,7 @@ public:
 	bool operator<(const LoggedUser& other) const {
 		return this->m_username < other.m_username;
 	}
-	std::string getUsername() { return m_username; };
+	std::string getUsername() const { return m_username; };
 private:
 	std::string  m_username;
 

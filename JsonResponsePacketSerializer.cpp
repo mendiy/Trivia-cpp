@@ -196,4 +196,63 @@ std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(Leave
     return buffer;
 }
 
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(GetGameResultsResponse gr)
+{
+    std::vector<unsigned char> buffer;
+    buffer.push_back(gr.status);
+    json j = {
+        {"status", gr.status},
+    };
+    j["Results"] = json::array();
+    for (PlayerResults pr : gr.results)
+    {
+        json playerData = {
+            {"Username", pr.username},
+            {"CorrectAnswersCount", pr.correctAnswerCount},
+            {"WrongAnswerCount", pr.wrongAnswerCount},
+            {"averageAnswerTime", pr.averageAnswerTime}
+        };
+        j["Results"].push_back(playerData);
+    }
+    serializeJson(j, buffer);
+    return buffer;
+}
+
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(SubmitAnswerResponse sa)
+{
+    std::vector<unsigned char> buffer;
+    buffer.push_back(sa.status);
+    json j;
+    j["status"] = sa.status;
+    serializeJson(j, buffer);
+    return buffer;
+}
+
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(GetQuestionResponse gq)
+{
+    std::vector<unsigned char> buffer;
+    buffer.push_back(gq.status);
+    json j = {
+        {"status", gq.status},
+        {"question", gq.question},
+    };
+    j["answers"] = json::object();
+    for (auto i = gq.answers.begin(); i != gq.answers.end(); i++)
+    {
+        j["answers"].push_back({i->first, i->second});
+    }
+    serializeJson(j, buffer);
+    return buffer;
+}
+
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(LeaveGameResponse lg)
+{
+    std::vector<unsigned char> buffer;
+    buffer.push_back(lg.status);
+    json j;
+    j["status"] = lg.status;
+    serializeJson(j, buffer);
+    return buffer;
+}
+
 

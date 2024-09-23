@@ -1,13 +1,11 @@
 #include "Game.h"
 
-int Game::m_gameId;
 
-
-Game::Game(std::map<LoggedUser, GameData> players, std::list<Question> questions)
+Game::Game(std::map<LoggedUser, GameData> players, std::list<Question> questions, unsigned int ID)
 {
     m_players = players;
     m_questions = questions;
-    m_gameId++;
+    m_id = ID;
 }
 
 Question Game::getQuestionForUser(LoggedUser user)
@@ -37,10 +35,10 @@ int Game::submitAnswer(LoggedUser user, int answer, float time)
    if (correct == answer)
     {
         m_players[user].correctAnswerCount++;
-        return 0;
+        return correct;
     }
     m_players[user].wrongAnswerCount++;
-    return 1;
+    return correct;
 }
 
 int Game::removePlayer(LoggedUser user)
@@ -49,7 +47,12 @@ int Game::removePlayer(LoggedUser user)
     return 0;
 }
 
-int Game::submitGameStatsToDB(std::map<LoggedUser, GameData> m_players, int m_gamrId)
+int Game::submitGameStatsToDB(std::map<LoggedUser, GameData> m_players, int id)
+{
+    return 0;
+}
+
+unsigned int Game::getId()
 {
     return 0;
 }

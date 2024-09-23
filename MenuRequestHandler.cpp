@@ -54,7 +54,7 @@ RequestResult MenuRequestHandler::handleRequest(RequestInfo reqInfo)
     }
     catch (...)
     {
-        ErrorResponse er = { "Error in server db" };
+        ErrorResponse er = { "Error in server db from menu handler" };
         std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(er);
         return { bufferToSend, nullptr };
     }
@@ -113,7 +113,7 @@ RequestResult MenuRequestHandler::joinRoom(RequestInfo reqInfo)
     if (success == 0)
     {
         std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(JoinRoomResponse());
-        return { bufferToSend, _handlerFactory.createMenuRequestHandler(_user) }; // next version we need to update handler
+        return { bufferToSend, _handlerFactory.createRoomMemberRequestHandler(_user, _handlerFactory.getRoomManager().getRoom(joinReq.roomId))}; 
     }
     ErrorResponse er = { "Error in join room" };
     std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(er);
@@ -128,11 +128,11 @@ RequestResult MenuRequestHandler::createRoom(RequestInfo reqInfo)
     room.name = createReq.roomName;
     room.numOfQuestionsInGame = createReq.questionCount;
     room.timePerQuestion = createReq.answerTimeout;
-    int success = _handlerFactory.getRoomManager().createRoom(_user, room);
-    if (success == 0)
+    int roomId = _handlerFactory.getRoomManager().createRoom(_user, room);
+    if (roomId > 0)
     {
         std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(CreateRoomResponse());
-        return { bufferToSend, _handlerFactory.createMenuRequestHandler(_user) }; // next version we need to update handler
+        return { bufferToSend, _handlerFactory.createRoomAdminHandler(_user, _handlerFactory.getRoomManager().getRoom(roomId)) };
     }
     ErrorResponse er = { "Error in create room" };
     std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(er);

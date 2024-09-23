@@ -11,19 +11,19 @@ int RoomManager::createRoom(LoggedUser logged, RoomData room)
 {
 	std::lock_guard<std::mutex> lock(m_roomMutex);
 	room.id = m_id;
-	room.isActive = true;
+	room.isActive = false;
 	m_id++;
 	for (auto it = m_rooms.begin(); it != m_rooms.end(); it++)
 	{
 		if ((it->second.getRoom().name) == room.name)
 		{
-			return 1;
+			return 0;
 		}
 	}
 
 	Room newRoom(room, logged);
 	m_rooms[room.id] = newRoom;
-	return 0;
+	return room.id;
 }
 
 int RoomManager::deleteRoom(int ID)
@@ -38,6 +38,13 @@ unsigned int RoomManager::getRoomState(int ID)
 	std::lock_guard<std::mutex> lock(m_roomMutex);
 
 	return m_rooms[ID].getRoom().isActive;
+}
+
+void RoomManager::setIsActive(int ID, bool newState)
+{
+	std::lock_guard<std::mutex> lock(m_roomMutex);
+
+	m_rooms[ID].setIsActive(newState);
 }
 
 std::vector<RoomData> RoomManager::getRooms()

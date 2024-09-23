@@ -48,14 +48,23 @@ CreateRoomRequest JsonRequestPacketDeserializer::deserializeCreateRoomRequest(st
 	return newReq;
 }
 
-int JsonRequestPacketDeserializer::binaryToDecimal(unsigned char* buffer)
+SubmitAnswerRequest JsonRequestPacketDeserializer::deserializeSubmitAnswerRequest(std::vector<unsigned char>& buffer)
 {
-	//unsigned char messageLen[DATA_LEN];
-	//for (int i = 0; i < DATA_LEN; i++)
-	//{
-	//	messageLen[i] = buffer[i];
-	//}
-
-	return (buffer[3] << 24) + (buffer[2] << 16) + (buffer[1] << 8) + buffer[0];
-
+	json reqJson = json::parse(buffer);
+	std::cout << "submit answer json: " << reqJson << "\n";
+	SubmitAnswerRequest newReq = { reqJson["id"]};
+	std::cout << "answer id: " << newReq.answerId << "\n";
+	return newReq;
 }
+
+//int JsonRequestPacketDeserializer::binaryToDecimal(unsigned char* buffer)
+//{
+//	//unsigned char messageLen[DATA_LEN];
+//	//for (int i = 0; i < DATA_LEN; i++)
+//	//{
+//	//	messageLen[i] = buffer[i];
+//	//}
+//
+//	return (buffer[3] << 24) + (buffer[2] << 16) + (buffer[1] << 8) + buffer[0];
+//
+//}

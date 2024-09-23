@@ -1,6 +1,6 @@
 #include "GameManager.h"
 #include <algorithm>
-
+#include <exception>
 
 
 Game GameManager::createGame(Room room)
@@ -13,7 +13,7 @@ Game GameManager::createGame(Room room)
     });
    
     std::list<Question> questions = m_database->getQuestions(room.getRoom().numOfQuestionsInGame);
-    Game newGame(game, questions);
+    Game newGame(game, questions, room.getRoom().id);
     m_games.push_back(newGame);
     return newGame;
 }
@@ -22,9 +22,21 @@ void GameManager::deleteGame(int gameId)
 {
     for (auto it = m_games.begin(); it != m_games.end(); it++)
     {
-        if (it->m_gameId == gameId)
+        if (it->getId() == gameId)
         {
             m_games.erase(it);
         } 
     }
+}
+
+Game GameManager::getGame(unsigned int id)
+{
+    for (auto it = m_games.begin(); it != m_games.end(); it++)
+    {
+        if (it->getId() == id)
+        {
+            return *it;
+        }
+    }
+    throw(std::exception("game id not found"));
 }

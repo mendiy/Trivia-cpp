@@ -42,3 +42,8 @@ std::vector<std::string> Room::getAllUsers()
 	}
     return allUsers;
 }
+
+void Room::setIsActive(bool newState)
+{
+	m_metadata.isActive = newState;
+}

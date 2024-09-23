@@ -4,7 +4,7 @@
 class Question
 {
 public:
-	Question() :m_id(0) {};
+	Question() :m_id(-1) {};
 	Question(int m_id, std::string m_question, std::vector<std::string> m_possibleAnswers);
 	~Question() {};
 	std::string getQuestion() { return m_question; };
