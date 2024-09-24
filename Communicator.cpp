@@ -47,6 +47,8 @@ void Communicator::startHandleRequest()
 		if (client_socket == INVALID_SOCKET)
 			throw std::exception(__FUNCTION__);
 
+		std::cout << "new connection\n";
+
 		// we need to add client to clients map
 		std::lock_guard<std::mutex> lock(_clientsMutex);
 		_clients[client_socket] = _handlerFactory.createLoginRequestHandler();
@@ -83,18 +85,35 @@ void Communicator::handleNewClient(SOCKET clientSocket)
 		const int HEADER_LENGTH = 5;
 		while (true)
 		{
+			//std::cout << "new loop in thread\n";
 			IRequestHandler* currentHandler = _clients[clientSocket];
 			char* header = new char[HEADER_LENGTH];
 			int res;
-			res = recv(clientSocket, header, HEADER_LENGTH, 0);
-			if (res == INVALID_SOCKET)
+			res = recv(clientSocket, header, HEADER_LENGTH, NULL);
+			if (res == SOCKET_ERROR)
 			{
+				delete[] header;
+				std::string s = "-1 Error while recieving from socket: ";
+				s += std::to_string(clientSocket);
+				s += ". ";
+				s += std::to_string(WSAGetLastError());
+				throw std::exception(s.c_str());
+			}
+			/*if (res == INVALID_SOCKET)
+			{
+				delete[] header;
 				std::string s = "Error while recieving from socket: ";
 				s += std::to_string(clientSocket);
 				throw std::exception(s.c_str());
-			}
+			}*/
 			if (res == 0)
-				continue;
+			{
+				delete[] header;
+				std::cout << "connection closed\n";
+				_clients.erase(clientSocket);
+				closesocket(clientSocket);
+				return;
+			}
 			unsigned char code = header[0];
 			std::cout << "code req: " << (unsigned int)code << "\n";
 			unsigned int jsonSize = 0;

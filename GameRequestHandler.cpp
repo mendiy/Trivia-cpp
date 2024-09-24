@@ -83,7 +83,7 @@ RequestResult GameRequestHandler::getGameResults(RequestInfo reqInfo) const
     gr.status = 1;
     std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(gr);
     if(gr.status == 1)
-        return { bufferToSend, _handlerFactory.createMenuRequestHandler(_user) }; //maybe go back to room
+        return { bufferToSend, _handlerFactory.createMenuRequestHandler(_user) }; //TODO maybe go back to room
     return { bufferToSend, _handlerFactory.createGameRequestHandler(_user, _game) };
 }
 
