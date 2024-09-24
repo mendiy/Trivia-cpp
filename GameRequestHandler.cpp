@@ -7,7 +7,7 @@
 #define GET_GAMES_RESULT_REQUEST_CODE 32
 #define LEAVE_GAME_REQUEST_CODE 33
 
-GameRequestHandler::GameRequestHandler(LoggedUser user, Game game, RequestHandlerFactory& handlerFactory)
+GameRequestHandler::GameRequestHandler(LoggedUser user, Game& game, RequestHandlerFactory& handlerFactory)
 	: _user(user.getUsername()), _game(game), _handlerFactory(handlerFactory)
 {
 }
@@ -59,7 +59,7 @@ RequestResult GameRequestHandler::getQuestion(RequestInfo reqInfo) const
 
 RequestResult GameRequestHandler::submitAnswer(RequestInfo reqInfo) const
 {
-    int correctAnswerId = _game.submitAnswer(_user, reqInfo.id, reqInfo.recievalTime); //TODO check time type and change to reference
+    int correctAnswerId = _game.submitAnswer(_user, reqInfo.id, reqInfo.recievalTime);
     SubmitAnswerResponse su;
     su.correctAnswerId = correctAnswerId;
     std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(su);
@@ -79,11 +79,17 @@ RequestResult GameRequestHandler::getGameResults(RequestInfo reqInfo) const
         pr.wrongAnswerCount = it->second.wrongAnswerCount;
         gr.results.push_back(pr);
     }
-    // TODO check if game ended and change status accordingly
-    gr.status = 1;
-    std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(gr);
-    if(gr.status == 1)
+   
+    bool isFinished = _game.gameIsFinished();
+    if (isFinished)
+    {
+        gr.status = 1;
+        std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(gr);
         return { bufferToSend, _handlerFactory.createMenuRequestHandler(_user) }; //maybe go back to room
+    }
+    gr.status = 0;
+    gr.results = std::vector<PlayerResults>();
+    std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(gr);
     return { bufferToSend, _handlerFactory.createGameRequestHandler(_user, _game) };
 }
 

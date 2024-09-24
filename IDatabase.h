@@ -1,8 +1,12 @@
 #pragma once
 #include <iostream>
 #include <list>
+#include <map>
 #include "Question.h"
+#include "Game.h"
 
+struct GameData;
+//class Game;
 
 class IDatabase
 {
@@ -19,4 +23,5 @@ public:
 	virtual int getNumOfPlayerGames(std::string) = 0;
 	virtual int getPlayerScore(std::string) = 0;
 	virtual std::vector<std::string> getHighScores() = 0;
+	virtual int submitGameStatistics(std::map<LoggedUser, GameData> m_players, int gameId) = 0;
 };

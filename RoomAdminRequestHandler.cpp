@@ -9,7 +9,7 @@
 #define CLOSE_ROOM_REQUEST 7
 #define START_GAME_REQUEST 8
 
-RoomAdminRequestHandler::RoomAdminRequestHandler(LoggedUser user, Room room, RequestHandlerFactory& handlerFactory)
+RoomAdminRequestHandler::RoomAdminRequestHandler(LoggedUser user, Room& room, RequestHandlerFactory& handlerFactory)
 	: _handlerFactory(handlerFactory), _user(user.getUsername()), _room(room)
 {
 }
@@ -58,7 +58,7 @@ RequestResult RoomAdminRequestHandler::closeRoom(RequestInfo reqInfo)
 
 RequestResult RoomAdminRequestHandler::startGame(RequestInfo reqInfo)
 {
-	Game newGame = _handlerFactory.getGameManager().createGame(_room);
+	Game& newGame = _handlerFactory.getGameManager().createGame(_room);
 	_handlerFactory.getRoomManager().setIsActive(_room.getRoom().id, true);
 	std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(StartGameResponse());
 	return { bufferToSend, _handlerFactory.createGameRequestHandler(_user, newGame)};

@@ -7,7 +7,7 @@
 #define GET_ROOM_STATE_REQUEST 5
 #define LEAVE_ROOM_REQUEST 6
 
-RoomMemberRequestHandler::RoomMemberRequestHandler(LoggedUser user, Room room, RequestHandlerFactory& handlerFactory)
+RoomMemberRequestHandler::RoomMemberRequestHandler(LoggedUser user, Room& room, RequestHandlerFactory& handlerFactory)
 	: _handlerFactory(handlerFactory), _user(user.getUsername()), _room(room)
 {
 }
@@ -51,7 +51,7 @@ RequestResult RoomMemberRequestHandler::getRoomState(RequestInfo reqInfo)
 
 RequestResult RoomMemberRequestHandler::leaveRoom(RequestInfo reqInfo)
 {
-	int success = _handlerFactory.getRoomManager().getRoom(_room.getRoom().id).removeUser(_user); // TODO change to reference
+	int success = _handlerFactory.getRoomManager().getRoom(_room.getRoom().id).removeUser(_user);
 	if (success == 0)
 	{
 		std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(LeaveRoomResponse());
