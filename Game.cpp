@@ -25,7 +25,7 @@ Question Game::getQuestionForUser(LoggedUser user)
     return Question();
 }
 
-int Game::submitAnswer(LoggedUser user, int answer, float time)
+int Game::submitAnswer(LoggedUser user, int answer, time_t time)
 {
     int currentCount = m_players[user].correctAnswerCount + m_players[user].wrongAnswerCount;
     float newAverage = ((m_players[user].averangeAnswerTime * currentCount) + time) / (currentCount + 1);
@@ -47,12 +47,30 @@ int Game::removePlayer(LoggedUser user)
     return 0;
 }
 
-int Game::submitGameStatsToDB(std::map<LoggedUser, GameData> m_players, int id)
+int Game::submitGameStatsToDB(std::map<LoggedUser, GameData> m_players, int id, IDatabase* m_database)
 {
-    return 0;
+    int res = m_database->submitGameStatistics(m_players, id);
+   
+    return res;
 }
 
 unsigned int Game::getId()
 {
-    return 0;
+    return m_id;
+}
+
+bool Game::gameIsFinished()
+{
+    int questionAmount = m_questions.size();
+    for (auto it = m_players.begin(); it != m_players.end(); it++)
+    {
+        int correct = it->second.correctAnswerCount;
+        int incorrect = it->second.wrongAnswerCount;
+        if ( (correct + incorrect)  != questionAmount)
+        {
+            return false;
+        }
+    }
+  
+    return true;
 }

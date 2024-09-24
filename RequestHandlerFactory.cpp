@@ -16,17 +16,17 @@ MenuRequestHandler* RequestHandlerFactory::createMenuRequestHandler(LoggedUser u
     return new MenuRequestHandler(user, *this);
 }
 
-RoomAdminRequestHandler* RequestHandlerFactory::createRoomAdminHandler(LoggedUser user, Room room)
+RoomAdminRequestHandler* RequestHandlerFactory::createRoomAdminHandler(LoggedUser user, Room& room)
 {
     return new RoomAdminRequestHandler(user, room, *this);
 }
 
-RoomMemberRequestHandler* RequestHandlerFactory::createRoomMemberRequestHandler(LoggedUser user, Room room)
+RoomMemberRequestHandler* RequestHandlerFactory::createRoomMemberRequestHandler(LoggedUser user, Room& room)
 {
     return new RoomMemberRequestHandler(user, room, *this);
 }
 
-GameRequestHandler* RequestHandlerFactory::createGameRequestHandler(LoggedUser user, Game game) // TODO check how to get game
+GameRequestHandler* RequestHandlerFactory::createGameRequestHandler(LoggedUser user, Game& game) 
 {
     return new GameRequestHandler(user, game, *this);
 }

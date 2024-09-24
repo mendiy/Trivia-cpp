@@ -3,7 +3,7 @@
 #include <exception>
 
 
-Game GameManager::createGame(Room room)
+Game& GameManager::createGame(Room room)
 {
     std::map<LoggedUser, GameData> game;
     std::vector<std::string> users = room.getAllUsers();
@@ -15,7 +15,7 @@ Game GameManager::createGame(Room room)
     std::list<Question> questions = m_database->getQuestions(room.getRoom().numOfQuestionsInGame);
     Game newGame(game, questions, room.getRoom().id);
     m_games.push_back(newGame);
-    return newGame;
+    return m_games[m_games.size() - 1];
 }
 
 void GameManager::deleteGame(int gameId)
@@ -29,7 +29,7 @@ void GameManager::deleteGame(int gameId)
     }
 }
 
-Game GameManager::getGame(unsigned int id)
+Game& GameManager::getGame(unsigned int id)
 {
     for (auto it = m_games.begin(); it != m_games.end(); it++)
     {
