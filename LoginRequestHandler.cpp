@@ -4,8 +4,8 @@
 #include "JsonResponsePacketSerializer.h"
 #include "RequestHandlerFactory.h"
 
-#define LOGIN_REQUEST_CODE 111
-#define SIGNUP_REQUEST_CODE 112
+#define LOGIN_REQUEST_CODE 2
+#define SIGNUP_REQUEST_CODE 3
 
 LoginRequestHandler::LoginRequestHandler(RequestHandlerFactory& handlerFactory) : _handlerFactory(handlerFactory)
 {

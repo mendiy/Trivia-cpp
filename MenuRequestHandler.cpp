@@ -5,13 +5,13 @@
 #include "RoomManager.h"
 #include "StatisticsManager.h"
 
-#define LOGOUT_REQUEST_CODE 200
-#define GET_ROOMS_REQUEST_CODE 201
-#define GET_PLAYERS_REQUEST_CODE 202
-#define GET_PERSONAL_STATS_REQUEST_CODE 203
-#define GET_HIGHSCORE_REQUEST_CODE 204
-#define JOIN_ROOM_REQUEST_CODE 205
-#define CREATE_ROOM_REQUEST_CODE 206
+#define LOGOUT_REQUEST_CODE 5
+#define GET_ROOMS_REQUEST_CODE 7
+#define GET_PLAYERS_REQUEST_CODE 11
+#define GET_PERSONAL_STATS_REQUEST_CODE 23
+#define GET_HIGHSCORE_REQUEST_CODE 19
+#define JOIN_ROOM_REQUEST_CODE 13
+#define CREATE_ROOM_REQUEST_CODE 17
 
 MenuRequestHandler::MenuRequestHandler(LoggedUser user, RequestHandlerFactory& handlerFactory) 
     : _handlerFactory(handlerFactory) , _user(user.getUsername())

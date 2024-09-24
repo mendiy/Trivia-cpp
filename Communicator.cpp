@@ -138,7 +138,7 @@ void Communicator::handleNewClient(SOCKET clientSocket)
 			{
 				buffer.push_back(data[i]);
 			}
-			//std::cout << buffer.data() << "\n";
+			std::cout << "buffer: " << buffer.data() << "\n";
 			delete[] data;
 			time_t timestamp;
 			RequestInfo reqInfo = { code, time(&timestamp), buffer};
