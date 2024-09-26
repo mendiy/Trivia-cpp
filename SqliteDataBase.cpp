@@ -9,7 +9,8 @@
 #include "StatisticsManager.h"
 
 
-
+// ToDo change all casting to static_cast 
+// ToDo change callback function to pascalCase
 static int userCallback(void* isExists, int argc, char** argv, char** azColName) {
     int i;
     if (argc > 0 && argv[0])
@@ -74,17 +75,25 @@ static int highScoresCallback(void* res, int argc, char** argv, char** azColName
 
 SqliteDataBase::SqliteDataBase()
 {
+   //ToDo create pointer to empty DB  
     db = nullptr;
 
     if (Open() == false)
     {
         throw "Failed to open DB";
     }
+
+    //  ToDo Dividing the function into several additional functions
+
     std::string userTable = "CREATE TABLE IF NOT EXISTS USERS ("
         "USERNAME TEXT NOT NULL PRIMARY KEY,"
         "PASSWORD TEXT NOT NULL,"
         "EMAIL TEXT NOT NULL); ";
+
+    // ToDo change this element to be 'string pointer' 
     char* errMessage = nullptr;
+
+    //ToDo change to try-catch block
     int res = sqlite3_exec(db, userTable.c_str(), nullptr, nullptr, &errMessage);
     if (res != SQLITE_OK)
         std::cout << "Failed to open User Table\n";
@@ -111,6 +120,8 @@ SqliteDataBase::SqliteDataBase()
         "UNCORRECT_ANSWERS INTEGER NOT NULL,"
         "SCORE INTEGER NOT NULL,"
         "PRIMARY KEY (USERNAME, GAME_ID));";
+    //ToDo remove this lines
+
     /*errMessage = nullptr;
     res = sqlite3_exec(db, statisticTable.c_str(), nullptr, nullptr, &errMessage);
     if (res != SQLITE_OK)
@@ -182,6 +193,7 @@ SqliteDataBase::SqliteDataBase()
 
 SqliteDataBase::~SqliteDataBase()
 {
+    //ToDo change to try-chatch block
     Close();
 }
 void SqliteDataBase::PrintQuestions(std::list<Question> questionList)
@@ -211,6 +223,7 @@ int SqliteDataBase::SubmitGameStatistics(std::map<LoggedUser, GameData> m_player
         /* Execute SQL statement */
         int rc = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &zErrMsg);
 
+        //ToDo change to try-chatch block
         if (rc != SQLITE_OK) {
             std::cerr << zErrMsg << "\n";
             sqlite3_free(zErrMsg);
@@ -236,6 +249,7 @@ bool SqliteDataBase::Open()
 
 bool SqliteDataBase::Close()
 {
+    //ToDo throw error if not closed
     sqlite3_close(db);
     return true;
 }

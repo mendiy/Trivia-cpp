@@ -1,6 +1,6 @@
 #include "Game.h"
 
-
+// ToDo handle exceptions cases
 Game::Game(std::map<LoggedUser, GameData> players, std::list<Question> questions, unsigned int ID)
 {
     m_players = players;
