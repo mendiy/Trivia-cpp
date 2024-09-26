@@ -8,17 +8,17 @@
 #define LEAVE_GAME_REQUEST_CODE 33
 
 GameRequestHandler::GameRequestHandler(LoggedUser user, Game& game, RequestHandlerFactory& handlerFactory)
-	: _user(user.getUsername()), _game(game), _handlerFactory(handlerFactory)
+    : _user(user.getUsername()), _game(game), _handlerFactory(handlerFactory)
 {
 }
 
 bool GameRequestHandler::isRequestRelevant(RequestInfo reqInfo)
 {
-	std::cout << ctime(&reqInfo.recievalTime) << "\n";
-	return reqInfo.id == GET_QUESTION_REQUEST_CODE
-		|| reqInfo.id == SUBMIT_ANSWER_REQUEST_CODE
-		|| reqInfo.id == GET_GAMES_RESULT_REQUEST_CODE
-		|| reqInfo.id == LEAVE_GAME_REQUEST_CODE;
+    std::cout << ctime(&reqInfo.recievalTime) << "\n";
+    return reqInfo.id == GET_QUESTION_REQUEST_CODE
+        || reqInfo.id == SUBMIT_ANSWER_REQUEST_CODE
+        || reqInfo.id == GET_GAMES_RESULT_REQUEST_CODE
+        || reqInfo.id == LEAVE_GAME_REQUEST_CODE;
 }
 
 RequestResult GameRequestHandler::handleRequest(RequestInfo reqInfo)

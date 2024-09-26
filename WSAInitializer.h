@@ -12,7 +12,7 @@
 class WSAInitializer
 {
 public:
-	WSAInitializer();
-	~WSAInitializer();
+    WSAInitializer();
+    ~WSAInitializer();
 };
 

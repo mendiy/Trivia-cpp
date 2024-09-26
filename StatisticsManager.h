@@ -7,11 +7,11 @@
 class StatisticsManager
 {
 public:
-	StatisticsManager(IDatabase* m_database);
-	std::vector<std::string> getHighScore();
-	std::vector<std::string> getUserStatistics(std::string username);
+    StatisticsManager(IDatabase* m_database);
+    std::vector<std::string> getHighScore();
+    std::vector<std::string> getUserStatistics(std::string username);
 private:
-	IDatabase* m_database;
-	std::mutex m_statisticMutex;
+    IDatabase* m_database;
+    std::mutex m_statisticMutex;
 
 };

@@ -15,20 +15,20 @@
 class RequestHandlerFactory
 {
 public:
-	RequestHandlerFactory(IDatabase* database);
-	LoginRequestHandler* createLoginRequestHandler();
-	MenuRequestHandler* createMenuRequestHandler(LoggedUser); 
-	RoomAdminRequestHandler* createRoomAdminHandler(LoggedUser, Room&); 
-	RoomMemberRequestHandler* createRoomMemberRequestHandler(LoggedUser, Room&); 
-	GameRequestHandler* createGameRequestHandler(LoggedUser, Game&);
-	LoginManager& getLoginManager();
-	RoomManager& getRoomManager();
-	StatisticsManager& getStatisticsManager();
-	GameManager& getGameManager();
+    RequestHandlerFactory(IDatabase* database);
+    LoginRequestHandler* createLoginRequestHandler();
+    MenuRequestHandler* createMenuRequestHandler(LoggedUser); 
+    RoomAdminRequestHandler* createRoomAdminHandler(LoggedUser, Room&); 
+    RoomMemberRequestHandler* createRoomMemberRequestHandler(LoggedUser, Room&); 
+    GameRequestHandler* createGameRequestHandler(LoggedUser, Game&);
+    LoginManager& getLoginManager();
+    RoomManager& getRoomManager();
+    StatisticsManager& getStatisticsManager();
+    GameManager& getGameManager();
 private:
-	LoginManager _loginManager;
-	RoomManager _roomManager;
-	StatisticsManager _statisticsManager;
-	GameManager _gameManager;
-	IDatabase* _database;
+    LoginManager _loginManager;
+    RoomManager _roomManager;
+    StatisticsManager _statisticsManager;
+    GameManager _gameManager;
+    IDatabase* _database;
 };

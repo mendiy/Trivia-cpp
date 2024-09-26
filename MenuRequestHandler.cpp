@@ -20,14 +20,14 @@ MenuRequestHandler::MenuRequestHandler(LoggedUser user, RequestHandlerFactory& h
 
 bool MenuRequestHandler::isRequestRelevant(RequestInfo reqInfo)
 {
-	std::cout << ctime(&reqInfo.recievalTime) << "\n";
-	return reqInfo.id == LOGOUT_REQUEST_CODE 
-		|| reqInfo.id == GET_ROOMS_REQUEST_CODE 
-		|| reqInfo.id == GET_PLAYERS_REQUEST_CODE
-		|| reqInfo.id == GET_PERSONAL_STATS_REQUEST_CODE
-		|| reqInfo.id == GET_HIGHSCORE_REQUEST_CODE
-		|| reqInfo.id == JOIN_ROOM_REQUEST_CODE
-		|| reqInfo.id == CREATE_ROOM_REQUEST_CODE;
+    std::cout << ctime(&reqInfo.recievalTime) << "\n";
+    return reqInfo.id == LOGOUT_REQUEST_CODE 
+        || reqInfo.id == GET_ROOMS_REQUEST_CODE 
+        || reqInfo.id == GET_PLAYERS_REQUEST_CODE
+        || reqInfo.id == GET_PERSONAL_STATS_REQUEST_CODE
+        || reqInfo.id == GET_HIGHSCORE_REQUEST_CODE
+        || reqInfo.id == JOIN_ROOM_REQUEST_CODE
+        || reqInfo.id == CREATE_ROOM_REQUEST_CODE;
 }
 
 RequestResult MenuRequestHandler::handleRequest(RequestInfo reqInfo)
