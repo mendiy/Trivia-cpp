@@ -8,7 +8,7 @@
 #define LEAVE_ROOM_REQUEST 6
 
 RoomMemberRequestHandler::RoomMemberRequestHandler(LoggedUser user, Room& room, RequestHandlerFactory& handlerFactory)
-    : _handlerFactory(handlerFactory), _user(user.getUsername()), _room(room)
+    : _handlerFactory(handlerFactory), _user(user.GetUsername()), _room(room)
 {
 }
 
@@ -37,21 +37,21 @@ RequestResult RoomMemberRequestHandler::getRoomState(RequestInfo reqInfo)
 {
     // TODO repeated code in admin handler and member handler
     GetRoomStateResponse roomState;
-    Room currentRoom = _handlerFactory.getRoomManager().getRoom(reqInfo.id);
-    RoomData currentRoomData = currentRoom.getRoom();
+    Room currentRoom = _handlerFactory.getRoomManager().GetRoomMeatdata(reqInfo.id);
+    RoomData currentRoomData = currentRoom.GetRoom();
     roomState.answerTimeout = currentRoomData.timePerQuestion;
     roomState.questionCount = currentRoomData.numOfQuestionsInGame;
     roomState.hasGameBegun = currentRoomData.isActive;
-    roomState.players = currentRoom.getAllUsers();
+    roomState.players = currentRoom.GetAllUsers();
     std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(roomState);
     if (roomState.hasGameBegun)
-        return { bufferToSend, _handlerFactory.createGameRequestHandler(_user, _handlerFactory.getGameManager().getGame(currentRoom.getRoom().id)) };
+        return { bufferToSend, _handlerFactory.createGameRequestHandler(_user, _handlerFactory.getGameManager().GetGame(currentRoom.GetRoom().id)) };
     return { bufferToSend, _handlerFactory.createRoomMemberRequestHandler(_user, _room) };
 }
 
 RequestResult RoomMemberRequestHandler::leaveRoom(RequestInfo reqInfo)
 {
-    int success = _handlerFactory.getRoomManager().getRoom(_room.getRoom().id).removeUser(_user);
+    int success = _handlerFactory.getRoomManager().GetRoomMeatdata(_room.GetRoom().id).RemoveUser(_user);
     if (success == 0)
     {
         std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(LeaveRoomResponse());

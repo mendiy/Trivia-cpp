@@ -6,7 +6,7 @@ Room::Room(RoomData metadata, LoggedUser logged)
     m_users.push_back(logged);
 }
 
-int Room::addUser(LoggedUser logged)
+int Room::AddUser(LoggedUser logged)
 {
     if (m_metadata.maxPlayers == m_users.size())
     {
@@ -17,11 +17,11 @@ int Room::addUser(LoggedUser logged)
     return 0;
 }
 
-int Room::removeUser(LoggedUser logged)
+int Room::RemoveUser(LoggedUser logged)
 {
     for (auto it = m_users.begin(); it != m_users.end(); it++)
     {
-        if (logged.getUsername() == it->getUsername())
+        if (logged.GetUsername() == it->GetUsername())
         {
             m_users.erase(it);
             return 0;
@@ -31,19 +31,19 @@ int Room::removeUser(LoggedUser logged)
     return 1;
 }
 
-std::vector<std::string> Room::getAllUsers()
+std::vector<std::string> Room::GetAllUsers()
 {
     std::vector<std::string> allUsers;
     for (auto it = m_users.begin(); it != m_users.end(); it++)
     {
         
-        allUsers.push_back(it->getUsername());
+        allUsers.push_back(it->GetUsername());
         
     }
     return allUsers;
 }
 
-void Room::setIsActive(bool newState)
+void Room::SetIsActive(bool newState)
 {
     m_metadata.isActive = newState;
 }

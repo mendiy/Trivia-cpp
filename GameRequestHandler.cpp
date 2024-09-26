@@ -8,7 +8,7 @@
 #define LEAVE_GAME_REQUEST_CODE 33
 
 GameRequestHandler::GameRequestHandler(LoggedUser user, Game& game, RequestHandlerFactory& handlerFactory)
-    : _user(user.getUsername()), _game(game), _handlerFactory(handlerFactory)
+    : _user(user.GetUsername()), _game(game), _handlerFactory(handlerFactory)
 {
 }
 
@@ -47,11 +47,11 @@ RequestResult GameRequestHandler::handleRequest(RequestInfo reqInfo)
 
 RequestResult GameRequestHandler::getQuestion(RequestInfo reqInfo) const
 {
-    Question currentQuestion = _game.getQuestionForUser(_user); 
+    Question currentQuestion = _game.GetQuestionForUser(_user); 
     GetQuestionResponse gq;
-    gq.question = currentQuestion.getQuestion();
-    for (int i = 0; i < currentQuestion.getPossibleAnswers().size(); i++)
-        gq.answers[i + 1] = currentQuestion.getPossibleAnswers()[i];
+    gq.question = currentQuestion.GetQuestion();
+    for (int i = 0; i < currentQuestion.GetPossibleAnswers().size(); i++)
+        gq.answers[i + 1] = currentQuestion.GetPossibleAnswers()[i];
     gq.status = gq.answers.size() > 0 ? 1 : 0;
     std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(gq);
     return { bufferToSend, _handlerFactory.createGameRequestHandler(_user, _game) };
@@ -59,7 +59,7 @@ RequestResult GameRequestHandler::getQuestion(RequestInfo reqInfo) const
 
 RequestResult GameRequestHandler::submitAnswer(RequestInfo reqInfo) const
 {
-    int correctAnswerId = _game.submitAnswer(_user, reqInfo.id, reqInfo.recievalTime);
+    int correctAnswerId = _game.SubmitAnswer(_user, reqInfo.id, reqInfo.recievalTime);
     SubmitAnswerResponse su;
     su.correctAnswerId = correctAnswerId;
     std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(su);
@@ -69,18 +69,18 @@ RequestResult GameRequestHandler::submitAnswer(RequestInfo reqInfo) const
 RequestResult GameRequestHandler::getGameResults(RequestInfo reqInfo) const
 {
     GetGameResultsResponse gr;
-    std::map<LoggedUser, GameData> res = _game.getGameResults();
+    std::map<LoggedUser, GameData> res = _game.GetGameResults();
     for (auto it = res.begin(); it != res.end(); it++)
     {
         PlayerResults pr;
-        pr.username = it->first.getUsername();
+        pr.username = it->first.GetUsername();
         pr.averageAnswerTime = it->second.averangeAnswerTime;
         pr.correctAnswerCount = it->second.correctAnswerCount;
         pr.wrongAnswerCount = it->second.wrongAnswerCount;
         gr.results.push_back(pr);
     }
    
-    bool isFinished = _game.gameIsFinished();
+    bool isFinished = _game.GameIsFinished();
     if (isFinished)
     {
         gr.status = 1;
@@ -95,10 +95,10 @@ RequestResult GameRequestHandler::getGameResults(RequestInfo reqInfo) const
 
 RequestResult GameRequestHandler::leaveGame(RequestInfo reqInfo) const
 {
-    int successRemovefromGame = _game.removePlayer(_user);
+    int successRemovefromGame = _game.RemovePlayer(_user);
     if (successRemovefromGame == 0)
     {
-        int successRemovefromRoom = _handlerFactory.getRoomManager().getRoom(_game.getId()).removeUser(_user);
+        int successRemovefromRoom = _handlerFactory.getRoomManager().GetRoomMeatdata(_game.getId()).RemoveUser(_user);
         if (successRemovefromRoom == 0)
         {
             std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(LeaveGameResponse());

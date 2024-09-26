@@ -7,7 +7,7 @@ RoomManager::RoomManager()
     m_id = 1;
 }
 
-int RoomManager::createRoom(LoggedUser logged, RoomData room)
+int RoomManager::CreateRoom(LoggedUser logged, RoomData room)
 {
     std::lock_guard<std::mutex> lock(m_roomMutex);
     room.id = m_id;
@@ -15,7 +15,7 @@ int RoomManager::createRoom(LoggedUser logged, RoomData room)
     m_id++;
     for (auto it = m_rooms.begin(); it != m_rooms.end(); it++)
     {
-        if ((it->second.getRoom().name) == room.name)
+        if ((it->second.GetRoom().name) == room.name)
         {
             return 0;
         }
@@ -26,39 +26,39 @@ int RoomManager::createRoom(LoggedUser logged, RoomData room)
     return room.id;
 }
 
-int RoomManager::deleteRoom(int ID)
+int RoomManager::DeleteRoom(int ID)
 {
     std::lock_guard<std::mutex> lock(m_roomMutex);
     m_rooms.erase(ID);
     return 0;
 }
 
-unsigned int RoomManager::getRoomState(int ID)
+unsigned int RoomManager::GetRoomState(int ID)
 {
     std::lock_guard<std::mutex> lock(m_roomMutex);
 
-    return m_rooms[ID].getRoom().isActive;
+    return m_rooms[ID].GetRoom().isActive;
 }
 
-void RoomManager::setIsActive(int ID, bool newState)
+void RoomManager::SetIsActive(int ID, bool newState)
 {
     std::lock_guard<std::mutex> lock(m_roomMutex);
 
-    m_rooms[ID].setIsActive(newState);
+    m_rooms[ID].SetIsActive(newState);
 }
 
-std::vector<RoomData> RoomManager::getRooms()
+std::vector<RoomData> RoomManager::GetRooms()
 {
     std::lock_guard<std::mutex> lock(m_roomMutex);
     std::vector<RoomData> allRooms;
     for (auto it = m_rooms.begin(); it != m_rooms.end(); it++)
     {
-        allRooms.push_back(it->second.getRoom());
+        allRooms.push_back(it->second.GetRoom());
     }
     return allRooms;
 }
 
-Room& RoomManager::getRoom(int ID)
+Room& RoomManager::GetRoomMeatdata(int ID)
 {
     std::lock_guard<std::mutex> lock(m_roomMutex);
     return m_rooms[ID];

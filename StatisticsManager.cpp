@@ -7,21 +7,21 @@ StatisticsManager::StatisticsManager(IDatabase* database)
     m_database = database;
 }
 
-std::vector<std::string> StatisticsManager::getHighScore()
+std::vector<std::string> StatisticsManager::GetHighScore()
 {
     std::lock_guard<std::mutex> lock(m_statisticMutex);
-    return m_database->getHighScores();
+    return m_database->GetHighScores();
 }
 
-std::vector<std::string> StatisticsManager::getUserStatistics(std::string username)
+std::vector<std::string> StatisticsManager::GetUserStatistics(std::string username)
 {
     std::lock_guard<std::mutex> lock(m_statisticMutex);
     std::vector<std::string> res;
-    float average = m_database->getPlayerAverageAnswerTime(username);
-    int totalAnswers = m_database->getNumOfTotalAnswers(username);
-    int correctAnswers = m_database->getNumOfCorrectAnswers(username);
-    int sumOfGames = m_database->getNumOfPlayerGames(username);
-    int totalScore = m_database->getPlayerScore(username);
+    float average = m_database->GetPlayerAverageAnswerTime(username);
+    int totalAnswers = m_database->GetNumOfTotalAnswers(username);
+    int correctAnswers = m_database->GetNumOfCorrectAnswers(username);
+    int sumOfGames = m_database->GetNumOfPlayerGames(username);
+    int totalScore = m_database->GetPlayerScore(username);
 
     res.push_back("Player Average Answer Time: " + std::to_string(average));
     res.push_back("Num Of Total Answers: " + std::to_string(totalAnswers));

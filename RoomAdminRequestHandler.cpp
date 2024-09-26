@@ -10,7 +10,7 @@
 #define START_GAME_REQUEST 8
 
 RoomAdminRequestHandler::RoomAdminRequestHandler(LoggedUser user, Room& room, RequestHandlerFactory& handlerFactory)
-    : _handlerFactory(handlerFactory), _user(user.getUsername()), _room(room)
+    : _handlerFactory(handlerFactory), _user(user.GetUsername()), _room(room)
 {
 }
 
@@ -45,7 +45,7 @@ RequestResult RoomAdminRequestHandler::handleRequest(RequestInfo reqInfo)
 
 RequestResult RoomAdminRequestHandler::closeRoom(RequestInfo reqInfo)
 {
-    int success = _handlerFactory.getRoomManager().deleteRoom(_room.getRoom().id);
+    int success = _handlerFactory.getRoomManager().DeleteRoom(_room.GetRoom().id);
     if (success == 0)
     {
         std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(CloseRoomResponse());
@@ -58,8 +58,8 @@ RequestResult RoomAdminRequestHandler::closeRoom(RequestInfo reqInfo)
 
 RequestResult RoomAdminRequestHandler::startGame(RequestInfo reqInfo)
 {
-    Game& newGame = _handlerFactory.getGameManager().createGame(_room);
-    _handlerFactory.getRoomManager().setIsActive(_room.getRoom().id, true);
+    Game& newGame = _handlerFactory.getGameManager().CreateGame(_room);
+    _handlerFactory.getRoomManager().SetIsActive(_room.GetRoom().id, true);
     std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(StartGameResponse());
     return { bufferToSend, _handlerFactory.createGameRequestHandler(_user, newGame)};
 }
@@ -68,12 +68,12 @@ RequestResult RoomAdminRequestHandler::getRoomState(RequestInfo reqInfo)
 {
     // TODO repeated code in admin handler and member handler
     GetRoomStateResponse roomState;
-    Room currentRoom = _handlerFactory.getRoomManager().getRoom(reqInfo.id);
-    RoomData currentRoomData = currentRoom.getRoom();
+    Room currentRoom = _handlerFactory.getRoomManager().GetRoomMeatdata(reqInfo.id);
+    RoomData currentRoomData = currentRoom.GetRoom();
     roomState.answerTimeout = currentRoomData.timePerQuestion;
     roomState.questionCount = currentRoomData.numOfQuestionsInGame;
     roomState.hasGameBegun = currentRoomData.isActive;
-    roomState.players = currentRoom.getAllUsers();
+    roomState.players = currentRoom.GetAllUsers();
     std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(roomState);
     return { bufferToSend, _handlerFactory.createRoomMemberRequestHandler(_user, _room) };
 }

@@ -8,12 +8,12 @@ class RoomManager
 {
 public:
     RoomManager();
-    int createRoom(LoggedUser logged, RoomData room);
-    int deleteRoom(int ID);
-    unsigned int getRoomState(int ID);
-    void setIsActive(int ID, bool newState);
-    std::vector<RoomData> getRooms();
-    Room& getRoom(int ID);
+    int CreateRoom(LoggedUser logged, RoomData room);
+    int DeleteRoom(int ID);
+    unsigned int GetRoomState(int ID);
+    void SetIsActive(int ID, bool newState);
+    std::vector<RoomData> GetRooms();
+    Room& GetRoomMeatdata(int ID);
 private:
     static int m_id;
     std::map<unsigned int, Room> m_rooms;

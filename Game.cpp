@@ -8,11 +8,11 @@ Game::Game(std::map<LoggedUser, GameData> players, std::list<Question> questions
     m_id = ID;
 }
 
-Question Game::getQuestionForUser(LoggedUser user)
+Question Game::GetQuestionForUser(LoggedUser user)
 {
     for (auto it = m_questions.begin(); it != m_questions.end(); it++)
     {
-        if (it->getQuestion() == m_players[user].currentQuestion.getQuestion())
+        if (it->GetQuestion() == m_players[user].currentQuestion.GetQuestion())
         {
             it++;
             if (it != m_questions.end())
@@ -25,13 +25,13 @@ Question Game::getQuestionForUser(LoggedUser user)
     return Question();
 }
 
-int Game::submitAnswer(LoggedUser user, int answer, time_t time)
+int Game::SubmitAnswer(LoggedUser user, int answer, time_t time)
 {
     int currentCount = m_players[user].correctAnswerCount + m_players[user].wrongAnswerCount;
     float newAverage = ((m_players[user].averangeAnswerTime * currentCount) + time) / (currentCount + 1);
     m_players[user].averangeAnswerTime = newAverage;
 
-   int correct = m_players[user].currentQuestion.getCorrectAnswerId();
+   int correct = m_players[user].currentQuestion.GetCorrectAnswerId();
    if (correct == answer)
     {
         m_players[user].correctAnswerCount++;
@@ -41,15 +41,15 @@ int Game::submitAnswer(LoggedUser user, int answer, time_t time)
     return correct;
 }
 
-int Game::removePlayer(LoggedUser user)
+int Game::RemovePlayer(LoggedUser user)
 {
     m_players.erase(user);
     return 0;
 }
 
-int Game::submitGameStatsToDB(std::map<LoggedUser, GameData> m_players, int id, IDatabase* m_database)
+int Game::SubmitGameStatsToDB(std::map<LoggedUser, GameData> m_players, int id, IDatabase* m_database)
 {
-    int res = m_database->submitGameStatistics(m_players, id);
+    int res = m_database->SubmitGameStatistics(m_players, id);
    
     return res;
 }
@@ -59,7 +59,7 @@ unsigned int Game::getId()
     return m_id;
 }
 
-bool Game::gameIsFinished()
+bool Game::GameIsFinished()
 {
     int questionAmount = m_questions.size();
     for (auto it = m_players.begin(); it != m_players.end(); it++)

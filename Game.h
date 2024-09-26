@@ -24,13 +24,13 @@ class Game
 {
 public:
     Game(std::map<LoggedUser, GameData> players, std::list<Question> questions, unsigned int ID);
-    Question getQuestionForUser(LoggedUser user);
-    int submitAnswer(LoggedUser user, int answer, time_t time);
-    int removePlayer(LoggedUser user);
-    int submitGameStatsToDB(std::map<LoggedUser, GameData> m_players, int m_gameId, IDatabase* m_database);
+    Question GetQuestionForUser(LoggedUser user);
+    int SubmitAnswer(LoggedUser user, int answer, time_t time);
+    int RemovePlayer(LoggedUser user);
+    int SubmitGameStatsToDB(std::map<LoggedUser, GameData> m_players, int m_gameId, IDatabase* m_database);
     unsigned int getId();
-    bool gameIsFinished();
-    inline std::map<LoggedUser, GameData> getGameResults() { return m_players; };
+    bool GameIsFinished();
+    inline std::map<LoggedUser, GameData> GetGameResults() { return m_players; };
 private:
     
     std::list<Question> m_questions;

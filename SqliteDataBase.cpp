@@ -76,7 +76,7 @@ SqliteDataBase::SqliteDataBase()
 {
     db = nullptr;
 
-    if (open() == false)
+    if (Open() == false)
     {
         throw "Failed to open DB";
     }
@@ -182,17 +182,17 @@ SqliteDataBase::SqliteDataBase()
 
 SqliteDataBase::~SqliteDataBase()
 {
-    close();
+    Close();
 }
-void SqliteDataBase::printQuestions(std::list<Question> questionList)
+void SqliteDataBase::PrintQuestions(std::list<Question> questionList)
 {
     for (auto it = questionList.begin(); it != questionList.end(); it++)
     {
-        std::cout << "question " << it->getQuestion() << "\n";
+        std::cout << "question " << it->GetQuestion() << "\n";
     }
 }
 
-int SqliteDataBase::submitGameStatistics(std::map<LoggedUser, GameData> m_players, int gameId)
+int SqliteDataBase::SubmitGameStatistics(std::map<LoggedUser, GameData> m_players, int gameId)
 {
     char* zErrMsg = 0;
     bool isExists = false;
@@ -204,7 +204,7 @@ int SqliteDataBase::submitGameStatistics(std::map<LoggedUser, GameData> m_player
         int totalTime = data.averangeAnswerTime * totalQuestions;
         int score = (data.correctAnswerCount * 10) - (data.wrongAnswerCount * 5);
         std::string sql = "INSERT INTO STATISTICS (USERNAME, GAME_ID, CORRECT_ANSWERS, TOTAL_TIME, TOTAL_QUESTIONS, UNCORRECT_ANSWERS, SCORE) VALUES"
-            "('" + user.getUsername() + "', " + std::to_string(gameId) + ", " + std::to_string(data.correctAnswerCount) + ", " 
+            "('" + user.GetUsername() + "', " + std::to_string(gameId) + ", " + std::to_string(data.correctAnswerCount) + ", " 
             + std::to_string(totalTime) + ", " + std::to_string(totalQuestions) + ", " + std::to_string(data.wrongAnswerCount) + ", " 
             + std::to_string(score) + ");";
 
@@ -220,7 +220,7 @@ int SqliteDataBase::submitGameStatistics(std::map<LoggedUser, GameData> m_player
     return 0;
 }
 
-bool SqliteDataBase::open()
+bool SqliteDataBase::Open()
 {
     std::string dbFileName = "Trivia_DB";
     int res = sqlite3_open(dbFileName.c_str(), &db);
@@ -234,13 +234,13 @@ bool SqliteDataBase::open()
     return true;
 }
 
-bool SqliteDataBase::close()
+bool SqliteDataBase::Close()
 {
     sqlite3_close(db);
     return true;
 }
 
-bool SqliteDataBase::doesUserExist(std::string username)
+bool SqliteDataBase::DoesUserExist(std::string username)
 {
     char* zErrMsg = 0;
     bool isExists = false;
@@ -259,7 +259,7 @@ bool SqliteDataBase::doesUserExist(std::string username)
     return isExists;
 }
 
-bool SqliteDataBase::doesPasswordMatch(std::string username, std::string password)
+bool SqliteDataBase::DoesPasswordMatch(std::string username, std::string password)
 {
     char* zErrMsg = 0;
     bool isMatch = false;
@@ -275,7 +275,7 @@ bool SqliteDataBase::doesPasswordMatch(std::string username, std::string passwor
     return isMatch;
 }
 
-bool SqliteDataBase::addNewUser(std::string username, std::string password, std::string email)
+bool SqliteDataBase::AddNewUser(std::string username, std::string password, std::string email)
 {
     char* zErrMsg = 0;
     std::cout << "from add new user: " << username << ", " << password << ", " << email << "\n";
@@ -293,7 +293,7 @@ bool SqliteDataBase::addNewUser(std::string username, std::string password, std:
     return true;
 }
 
-std::list<Question> SqliteDataBase::getQuestions(int amount)
+std::list<Question> SqliteDataBase::GetQuestions(int amount)
 {
     std::list<Question> questionsList;
     char* zErrMsg = 0;
@@ -308,7 +308,7 @@ std::list<Question> SqliteDataBase::getQuestions(int amount)
     return questionsList;
 }
 
-float SqliteDataBase::getPlayerAverageAnswerTime(std::string username)
+float SqliteDataBase::GetPlayerAverageAnswerTime(std::string username)
 {
     float average = 0;
     char* zErrMsg = 0;
@@ -325,7 +325,7 @@ float SqliteDataBase::getPlayerAverageAnswerTime(std::string username)
     return average;
 }
 
-int SqliteDataBase::getNumOfCorrectAnswers(std::string username)
+int SqliteDataBase::GetNumOfCorrectAnswers(std::string username)
 {
     int total = 0;
     char* zErrMsg = 0;
@@ -342,7 +342,7 @@ int SqliteDataBase::getNumOfCorrectAnswers(std::string username)
     return total;
 }
 
-int SqliteDataBase::getNumOfTotalAnswers(std::string username)
+int SqliteDataBase::GetNumOfTotalAnswers(std::string username)
 {
     int total = 0;
     char* zErrMsg = 0;
@@ -359,7 +359,7 @@ int SqliteDataBase::getNumOfTotalAnswers(std::string username)
     return total;
 }
 
-int SqliteDataBase::getNumOfPlayerGames(std::string username)
+int SqliteDataBase::GetNumOfPlayerGames(std::string username)
 {
     int total = 0;
     char* zErrMsg = 0;
@@ -376,7 +376,7 @@ int SqliteDataBase::getNumOfPlayerGames(std::string username)
     return total;
 }
 
-int SqliteDataBase::getPlayerScore(std::string username)
+int SqliteDataBase::GetPlayerScore(std::string username)
 {
     int total = 0;
     char* zErrMsg = 0;
@@ -393,7 +393,7 @@ int SqliteDataBase::getPlayerScore(std::string username)
     return total;
 }
 
-std::vector<std::string> SqliteDataBase::getHighScores()
+std::vector<std::string> SqliteDataBase::GetHighScores()
 {
      std::vector<std::string> res;
     char* zErrMsg = 0;

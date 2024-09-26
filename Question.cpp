@@ -7,7 +7,7 @@ Question::Question(int correctAnswerid, std::string question, std::vector<std::s
     m_possibleAnswers = possibleAnswers;
 }
 
-int Question::getCorrectAnswerId()
+int Question::GetCorrectAnswerId()
 {
     return m_correctAnswerid;
 }

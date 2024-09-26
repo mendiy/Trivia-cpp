@@ -1,10 +1,10 @@
 #include "LoginManager.h"
 #include <algorithm>
 
-int LoginManager::signup(std::string username, std::string password, std::string email)
+int LoginManager::Signup(std::string username, std::string password, std::string email)
 {
     std::lock_guard<std::mutex> lock(m_loginMutex);
-    bool logged = m_database->addNewUser(username, password, email);
+    bool logged = m_database->AddNewUser(username, password, email);
     if (logged)
     {
         LoggedUser loggedUser(username);
@@ -14,11 +14,11 @@ int LoginManager::signup(std::string username, std::string password, std::string
     return 1;
 }
 
-int LoginManager::login(std::string username, std::string password)
+int LoginManager::Login(std::string username, std::string password)
 {
     std::lock_guard<std::mutex> lock(m_loginMutex);
 
-    bool logged = m_database->doesPasswordMatch(username, password);
+    bool logged = m_database->DoesPasswordMatch(username, password);
     if (logged)
     {
         LoggedUser loggedUser(username);
@@ -28,13 +28,13 @@ int LoginManager::login(std::string username, std::string password)
     return 1;
 }
 
-int LoginManager::logout(std::string username)
+int LoginManager::Logout(std::string username)
 {
     std::lock_guard<std::mutex> lock(m_loginMutex);
 
     for (auto it = m_loggedUsers.begin(); it != m_loggedUsers.end(); it++)
     {
-        if (it->getUsername() == username)
+        if (it->GetUsername() == username)
         {
             m_loggedUsers.erase(it);
             return 0;

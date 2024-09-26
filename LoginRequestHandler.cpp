@@ -38,7 +38,7 @@ RequestResult LoginRequestHandler::login(RequestInfo reqInfo)
     LoginRequest lr = JsonRequestPacketDeserializer::deserializeLoginRequest(reqInfo.buffer);
     std::cout << lr.username << ", " << lr.password << "\n";
     // call login manager
-    int successLogin = _handlerFactory.getLoginManager().login(lr.username, lr.password);
+    int successLogin = _handlerFactory.getLoginManager().Login(lr.username, lr.password);
     if (successLogin == 0)
     {
         std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(LoginResponse());
@@ -54,7 +54,7 @@ RequestResult LoginRequestHandler::signup(RequestInfo reqInfo)
 {
     SignupRequest sr = JsonRequestPacketDeserializer::deserializeSignupRequest(reqInfo.buffer);
     // call login manager
-    int successSignup = _handlerFactory.getLoginManager().signup(sr.username, sr.password, sr.email);
+    int successSignup = _handlerFactory.getLoginManager().Signup(sr.username, sr.password, sr.email);
     if (successSignup == 0)
     {
         std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(SignUpResponse());
