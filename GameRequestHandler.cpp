@@ -2,17 +2,17 @@
 #include "JsonResponsePacketSerializer.h"
 #include "RequestHandlerFactory.h"
 
-#define GET_QUESTION_REQUEST_CODE 30
-#define SUBMIT_ANSWER_REQUEST_CODE 31
-#define GET_GAMES_RESULT_REQUEST_CODE 32
-#define LEAVE_GAME_REQUEST_CODE 33
+const unsigned int GET_QUESTION_REQUEST_CODE = 30;
+const unsigned int SUBMIT_ANSWER_REQUEST_CODE = 31;
+const unsigned int GET_GAMES_RESULT_REQUEST_CODE = 32;
+const unsigned int LEAVE_GAME_REQUEST_CODE = 33;
 
 GameRequestHandler::GameRequestHandler(LoggedUser user, Game& game, RequestHandlerFactory& handlerFactory)
-    : _user(user.getUsername()), _game(game), _handlerFactory(handlerFactory)
+    : m_user(user.getUsername()), m_game(game), m_handlerFactory(handlerFactory)
 {
 }
 
-bool GameRequestHandler::isRequestRelevant(RequestInfo reqInfo)
+bool GameRequestHandler::IsRequestRelevant(RequestInfo reqInfo)
 {
     std::cout << ctime(&reqInfo.recievalTime) << "\n";
     return reqInfo.id == GET_QUESTION_REQUEST_CODE
@@ -21,20 +21,20 @@ bool GameRequestHandler::isRequestRelevant(RequestInfo reqInfo)
         || reqInfo.id == LEAVE_GAME_REQUEST_CODE;
 }
 
-RequestResult GameRequestHandler::handleRequest(RequestInfo reqInfo)
+RequestResult GameRequestHandler::HandleRequest(RequestInfo reqInfo)
 {
     try
     {
         switch (reqInfo.id)
         {
         case GET_QUESTION_REQUEST_CODE:
-            return getQuestion(reqInfo);
+            return GetQuestion(reqInfo);
         case SUBMIT_ANSWER_REQUEST_CODE:
-            return submitAnswer(reqInfo);
+            return SubmitAnswer(reqInfo);
         case GET_GAMES_RESULT_REQUEST_CODE:
-            return getGameResults(reqInfo);
+            return GetGameResults(reqInfo);
         case LEAVE_GAME_REQUEST_CODE:
-            return leaveGame(reqInfo);
+            return LeaveGame(reqInfo);
         }
     }
     catch (...)
@@ -45,31 +45,31 @@ RequestResult GameRequestHandler::handleRequest(RequestInfo reqInfo)
     }
 }
 
-RequestResult GameRequestHandler::getQuestion(RequestInfo reqInfo) const
+RequestResult GameRequestHandler::GetQuestion(RequestInfo reqInfo) const
 {
-    Question currentQuestion = _game.getQuestionForUser(_user); 
+    Question currentQuestion = m_game.getQuestionForUser(m_user); 
     GetQuestionResponse gq;
     gq.question = currentQuestion.getQuestion();
     for (int i = 0; i < currentQuestion.getPossibleAnswers().size(); i++)
         gq.answers[i + 1] = currentQuestion.getPossibleAnswers()[i];
     gq.status = gq.answers.size() > 0 ? 1 : 0;
     std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(gq);
-    return { bufferToSend, _handlerFactory.createGameRequestHandler(_user, _game) };
+    return { bufferToSend, m_handlerFactory.createGameRequestHandler(m_user, m_game) };
 }
 
-RequestResult GameRequestHandler::submitAnswer(RequestInfo reqInfo) const
+RequestResult GameRequestHandler::SubmitAnswer(RequestInfo reqInfo) const
 {
-    int correctAnswerId = _game.submitAnswer(_user, reqInfo.id, reqInfo.recievalTime);
+    int correctAnswerId = m_game.submitAnswer(m_user, reqInfo.id, reqInfo.recievalTime);
     SubmitAnswerResponse su;
     su.correctAnswerId = correctAnswerId;
     std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(su);
-    return { bufferToSend, _handlerFactory.createGameRequestHandler(_user, _game) };
+    return { bufferToSend, m_handlerFactory.createGameRequestHandler(m_user, m_game) };
 }
 
-RequestResult GameRequestHandler::getGameResults(RequestInfo reqInfo) const
+RequestResult GameRequestHandler::GetGameResults(RequestInfo reqInfo) const
 {
     GetGameResultsResponse gr;
-    std::map<LoggedUser, GameData> res = _game.getGameResults();
+    std::map<LoggedUser, GameData> res = m_game.getGameResults();
     for (auto it = res.begin(); it != res.end(); it++)
     {
         PlayerResults pr;
@@ -80,29 +80,29 @@ RequestResult GameRequestHandler::getGameResults(RequestInfo reqInfo) const
         gr.results.push_back(pr);
     }
    
-    bool isFinished = _game.gameIsFinished();
+    bool isFinished = m_game.gameIsFinished();
     if (isFinished)
     {
         gr.status = 1;
         std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(gr);
-        return { bufferToSend, _handlerFactory.createMenuRequestHandler(_user) }; //maybe go back to room
+        return { bufferToSend, m_handlerFactory.createMenuRequestHandler(m_user) }; //maybe go back to room
     }
     gr.status = 0;
     gr.results = std::vector<PlayerResults>();
     std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(gr);
-    return { bufferToSend, _handlerFactory.createGameRequestHandler(_user, _game) };
+    return { bufferToSend, m_handlerFactory.createGameRequestHandler(m_user, m_game) };
 }
 
-RequestResult GameRequestHandler::leaveGame(RequestInfo reqInfo) const
+RequestResult GameRequestHandler::LeaveGame(RequestInfo reqInfo) const
 {
-    int successRemovefromGame = _game.removePlayer(_user);
+    int successRemovefromGame = m_game.removePlayer(m_user);
     if (successRemovefromGame == 0)
     {
-        int successRemovefromRoom = _handlerFactory.getRoomManager().getRoom(_game.getId()).removeUser(_user);
+        int successRemovefromRoom = m_handlerFactory.getRoomManager().getRoom(m_game.getId()).removeUser(m_user);
         if (successRemovefromRoom == 0)
         {
             std::vector<unsigned char> bufferToSend = JsonResponsePacketSerializer::serializeResponse(LeaveGameResponse());
-            return { bufferToSend, _handlerFactory.createMenuRequestHandler(_user)}; 
+            return { bufferToSend, m_handlerFactory.createMenuRequestHandler(m_user)}; 
         }
     }
     throw(std::exception("error remove user from game"));

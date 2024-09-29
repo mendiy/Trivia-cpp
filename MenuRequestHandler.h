@@ -8,8 +8,8 @@ class MenuRequestHandler : public IRequestHandler
 {
 public:
     MenuRequestHandler(LoggedUser user, RequestHandlerFactory& handlerFactory);
-    virtual bool isRequestRelevant(RequestInfo reqInfo) override;
-    virtual RequestResult handleRequest(RequestInfo reqInfo) override;
+    virtual bool IsRequestRelevant(RequestInfo reqInfo) override;
+    virtual RequestResult HandleRequest(RequestInfo reqInfo) override;
 private:
     LoggedUser _user;
     RequestHandlerFactory& _handlerFactory;

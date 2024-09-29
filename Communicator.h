@@ -12,13 +12,13 @@ class Communicator
 {
 public:
     Communicator(RequestHandlerFactory& handlerFactory);
-    ~Communicator(); // need to clean the map 
-    void startHandleRequest();
+    ~Communicator(); 
+    void StartHandleRequest();
 private:
-    void bindAndListen() const;
-    void handleNewClient(SOCKET clientSocket);
-    SOCKET _serverSocket;
-    unordered_map<SOCKET, IRequestHandler*> _clients;
-    RequestHandlerFactory& _handlerFactory;
-    std::mutex _clientsMutex;
+    void BindAndListen() const;
+    void HandleNewClient(SOCKET clientSocket);
+    SOCKET m_serverSocket;
+    unordered_map<SOCKET, IRequestHandler*> m_clients;
+    RequestHandlerFactory& m_handlerFactory;
+    std::mutex m_clientsMutex;
 };

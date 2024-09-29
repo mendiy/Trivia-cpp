@@ -12,12 +12,12 @@ RoomMemberRequestHandler::RoomMemberRequestHandler(LoggedUser user, Room& room, 
 {
 }
 
-bool RoomMemberRequestHandler::isRequestRelevant(RequestInfo reqInfo)
+bool RoomMemberRequestHandler::IsRequestRelevant(RequestInfo reqInfo)
 {
     return reqInfo.id == GET_ROOM_STATE_REQUEST || reqInfo.id == LEAVE_ROOM_REQUEST;
 }
 
-RequestResult RoomMemberRequestHandler::handleRequest(RequestInfo reqInfo)
+RequestResult RoomMemberRequestHandler::HandleRequest(RequestInfo reqInfo)
 {
     try
     {

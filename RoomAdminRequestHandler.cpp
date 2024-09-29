@@ -14,14 +14,14 @@ RoomAdminRequestHandler::RoomAdminRequestHandler(LoggedUser user, Room& room, Re
 {
 }
 
-bool RoomAdminRequestHandler::isRequestRelevant(RequestInfo reqInfo)
+bool RoomAdminRequestHandler::IsRequestRelevant(RequestInfo reqInfo)
 {
     return reqInfo.id == GET_ROOM_ADMIN_STATE_REQUEST
         || reqInfo.id == CLOSE_ROOM_REQUEST
         || reqInfo.id == START_GAME_REQUEST;
 }
 
-RequestResult RoomAdminRequestHandler::handleRequest(RequestInfo reqInfo)
+RequestResult RoomAdminRequestHandler::HandleRequest(RequestInfo reqInfo)
 {
     try
     {

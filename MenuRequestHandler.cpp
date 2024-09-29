@@ -18,7 +18,7 @@ MenuRequestHandler::MenuRequestHandler(LoggedUser user, RequestHandlerFactory& h
 {
 }
 
-bool MenuRequestHandler::isRequestRelevant(RequestInfo reqInfo)
+bool MenuRequestHandler::IsRequestRelevant(RequestInfo reqInfo)
 {
     std::cout << ctime(&reqInfo.recievalTime) << "\n";
     return reqInfo.id == LOGOUT_REQUEST_CODE 
@@ -30,7 +30,7 @@ bool MenuRequestHandler::isRequestRelevant(RequestInfo reqInfo)
         || reqInfo.id == CREATE_ROOM_REQUEST_CODE;
 }
 
-RequestResult MenuRequestHandler::handleRequest(RequestInfo reqInfo)
+RequestResult MenuRequestHandler::HandleRequest(RequestInfo reqInfo)
 {
     try
     {

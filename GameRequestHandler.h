@@ -9,15 +9,15 @@ class GameRequestHandler : public IRequestHandler
 {
 public:
     GameRequestHandler(LoggedUser user, Game& game, RequestHandlerFactory& handlerFactory);
-    virtual bool isRequestRelevant(RequestInfo reqInfo) override;
-    virtual RequestResult handleRequest(RequestInfo reqInfo) override;
+    virtual bool IsRequestRelevant(RequestInfo reqInfo) override;
+    virtual RequestResult HandleRequest(RequestInfo reqInfo) override;
 private:
-    Game& _game;
-    LoggedUser _user;
-    // GameManager& _gameManager; not needed because we can get access from the factory getter
-    RequestHandlerFactory& _handlerFactory;
-    RequestResult getQuestion(RequestInfo reqInfo) const;
-    RequestResult submitAnswer(RequestInfo reqInfo) const;
-    RequestResult getGameResults(RequestInfo reqInfo) const;
-    RequestResult leaveGame(RequestInfo reqInfo) const;
+    Game& m_game;
+    LoggedUser m_user;
+    // GameManager& _gameManager; found in the uml, but not needed because we can get access from the factory getter
+    RequestHandlerFactory& m_handlerFactory;
+    RequestResult GetQuestion(RequestInfo reqInfo) const;
+    RequestResult SubmitAnswer(RequestInfo reqInfo) const;
+    RequestResult GetGameResults(RequestInfo reqInfo) const;
+    RequestResult LeaveGame(RequestInfo reqInfo) const;
 };

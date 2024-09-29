@@ -15,7 +15,7 @@ Server::~Server()
 
 void Server::run()
 {
-    std::thread communicatorThread(&Communicator::startHandleRequest, this->_communicator);
+    std::thread communicatorThread(&Communicator::StartHandleRequest, this->_communicator);
     communicatorThread.detach();
 
     std::string adminInput = "";

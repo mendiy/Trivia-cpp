@@ -16,11 +16,11 @@
 
 static const unsigned short PORT = 8000;
 
-Communicator::Communicator(RequestHandlerFactory& handlerFactory) : _clients() , _handlerFactory(handlerFactory)
+Communicator::Communicator(RequestHandlerFactory& handlerFactory) : m_clients(), m_handlerFactory(handlerFactory)
 {
-    _serverSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    m_serverSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-    if (_serverSocket == INVALID_SOCKET)
+    if (m_serverSocket == INVALID_SOCKET)
         throw std::exception(__FUNCTION__ " - socket");
 }
 
@@ -29,38 +29,39 @@ Communicator::~Communicator()
 {
     try
     {
-        closesocket(_serverSocket);
-        std::for_each(_clients.begin(), _clients.end(), [](auto& pair) { delete pair.second; });    
+        closesocket(m_serverSocket);
+        std::for_each(m_clients.begin(), m_clients.end(), [](auto& pair) { delete pair.second; });
     }
-    catch(...)
-    { }
+    catch (...)
+    {
+    }
 }
 
-void Communicator::startHandleRequest()
+void Communicator::StartHandleRequest()
 {
-    
-    bindAndListen();
+
+    BindAndListen();
 
     while (true)
     {
-        SOCKET client_socket = accept(_serverSocket, NULL, NULL);
+        SOCKET client_socket = accept(m_serverSocket, NULL, NULL);
         if (client_socket == INVALID_SOCKET)
             throw std::exception(__FUNCTION__);
 
         std::cout << "new connection\n";
 
         // we need to add client to clients map
-        std::lock_guard<std::mutex> lock(_clientsMutex);
-        _clients[client_socket] = _handlerFactory.createLoginRequestHandler();
+        std::lock_guard<std::mutex> lock(m_clientsMutex);
+        m_clients[client_socket] = m_handlerFactory.createLoginRequestHandler();
 
         // create new thread for client    and detach from it
-        
-        std::thread clientThread(&Communicator::handleNewClient, this, client_socket);
+
+        std::thread clientThread(&Communicator::HandleNewClient, this, client_socket);
         clientThread.detach();
     }
 }
 
-void Communicator::bindAndListen() const
+void Communicator::BindAndListen() const
 {
     struct sockaddr_in sa = { 0 };
 
@@ -69,24 +70,23 @@ void Communicator::bindAndListen() const
     sa.sin_addr.s_addr = 0;    // when there are few ip's for the machine. We will use always "INADDR_ANY"
 
     // Connects between the socket and the configuration (port and etc..)
-    if (bind(_serverSocket, (struct sockaddr*)&sa, sizeof(sa)) == SOCKET_ERROR)
+    if (bind(m_serverSocket, (struct sockaddr*) &sa, sizeof(sa)) == SOCKET_ERROR)
         throw std::exception(__FUNCTION__ " - bind");
 
     // Start listening for incoming requests of clients
-    if (listen(_serverSocket, SOMAXCONN) == SOCKET_ERROR)
+    if (listen(m_serverSocket, SOMAXCONN) == SOCKET_ERROR)
         throw std::exception(__FUNCTION__ " - listen");
     std::cout << "Listening on port " << PORT << std::endl;
 }
 
-void Communicator::handleNewClient(SOCKET clientSocket)
+void Communicator::HandleNewClient(SOCKET clientSocket)
 {
     try
     {
         const int HEADER_LENGTH = 5;
         while (true)
         {
-            //std::cout << "new loop in thread\n";
-            IRequestHandler* currentHandler = _clients[clientSocket];
+            IRequestHandler* currentHandler = m_clients[clientSocket];
             char* header = new char[HEADER_LENGTH];
             int res;
             res = recv(clientSocket, header, HEADER_LENGTH, NULL);
@@ -99,23 +99,17 @@ void Communicator::handleNewClient(SOCKET clientSocket)
                 s += std::to_string(WSAGetLastError());
                 throw std::exception(s.c_str());
             }
-            /*if (res == INVALID_SOCKET)
-            {
-                delete[] header;
-                std::string s = "Error while recieving from socket: ";
-                s += std::to_string(clientSocket);
-                throw std::exception(s.c_str());
-            }*/
+            
             if (res == 0)
             {
                 delete[] header;
                 std::cout << "connection closed\n";
-                _clients.erase(clientSocket);
+                m_clients.erase(clientSocket);
                 closesocket(clientSocket);
                 return;
             }
             unsigned char code = header[0];
-            std::cout << "code req: " << (unsigned int)code << "\n";
+            std::cout << "code req: " << (unsigned int) code << "\n";
             unsigned int jsonSize = 0;
             for (int i = 1; i < HEADER_LENGTH; i++)
             {
@@ -133,7 +127,7 @@ void Communicator::handleNewClient(SOCKET clientSocket)
                 s += std::to_string(clientSocket);
                 throw std::exception(s.c_str());
             }
-            
+
             for (int i = 0; i < jsonSize; i++)
             {
                 buffer.push_back(data[i]);
@@ -141,15 +135,15 @@ void Communicator::handleNewClient(SOCKET clientSocket)
             std::cout << "buffer: " << buffer.data() << "\n";
             delete[] data;
             time_t timestamp;
-            RequestInfo reqInfo = { code, time(&timestamp), buffer};
-            if (currentHandler->isRequestRelevant(reqInfo))
+            RequestInfo reqInfo = { code, time(&timestamp), buffer };
+            if (currentHandler->IsRequestRelevant(reqInfo))
             {
-                RequestResult reqRes = currentHandler->handleRequest(reqInfo);
+                RequestResult reqRes = currentHandler->HandleRequest(reqInfo);
                 if (!reqRes.newHandler)
                     throw(std::exception("error in server db")); // throw or remain in same state
                 delete currentHandler;
-                std::unique_lock<std::mutex> lock(_clientsMutex);
-                _clients[clientSocket] = reqRes.newHandler;
+                std::unique_lock<std::mutex> lock(m_clientsMutex);
+                m_clients[clientSocket] = reqRes.newHandler;
                 lock.unlock();
                 int resSize = reqRes.response.size();
                 char* response = new char[resSize];
@@ -184,7 +178,7 @@ void Communicator::handleNewClient(SOCKET clientSocket)
     catch (const std::exception& e)
     {
         std::cout << "error on client thread:\t" << e.what() << "\n";
-        _clients.erase(clientSocket);
+        m_clients.erase(clientSocket);
         closesocket(clientSocket);
     }
 }

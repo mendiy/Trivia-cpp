@@ -11,13 +11,13 @@ LoginRequestHandler::LoginRequestHandler(RequestHandlerFactory& handlerFactory) 
 {
 }
 
-bool LoginRequestHandler::isRequestRelevant(RequestInfo reqInfo)
+bool LoginRequestHandler::IsRequestRelevant(RequestInfo reqInfo)
 {
     std::cout << ctime(&reqInfo.recievalTime) << "\n";
     return reqInfo.id == LOGIN_REQUEST_CODE || reqInfo.id == SIGNUP_REQUEST_CODE;
 }
 
-RequestResult LoginRequestHandler::handleRequest(RequestInfo reqInfo)
+RequestResult LoginRequestHandler::HandleRequest(RequestInfo reqInfo)
 {
     try
     {
