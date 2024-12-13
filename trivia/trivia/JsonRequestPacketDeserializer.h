@@ -16,6 +16,7 @@ struct SignupRequest
 	std::string username;
 	std::string password;
 	std::string email;
+
 };
 
 class JsonRequestPacketDeserializer
